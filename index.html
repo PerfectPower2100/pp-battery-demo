@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0099db">
+<title>PP Battery App - Demo</title>
+<style>
+:root{
+  --blue:#0099db; --yellow:#f5dc00; --green:#79b829; --ink:#333333;
+  --bg:#f4f6f8; --card:#ffffff; --line:#e3e8ed; --red:#d84343;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);max-width:480px;margin:0 auto;min-height:100vh}
+header{background:#fff;border-bottom:3px solid var(--blue);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+header img{height:34px}
+header .t{font-weight:700;font-size:15px;line-height:1.15}
+header .t small{display:block;font-weight:400;color:#777;font-size:11px}
+.badge{margin-left:auto;font-size:10px;font-weight:700;color:#fff;background:var(--green);border-radius:10px;padding:3px 8px}
+.badge.off{background:#999}
+.screen{display:none;padding:16px;padding-bottom:96px}
+.screen.on{display:block}
+h2{font-size:20px;margin:6px 0 2px}
+.sub{color:#667;font-size:13px;margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card.tap{cursor:pointer;transition:transform .06s}
+.card.tap:active{transform:scale(.985)}
+.jobrow{display:flex;align-items:center;gap:12px}
+.jobrow .dist{background:var(--blue);color:#fff;border-radius:10px;font-weight:800;font-size:13px;padding:8px 9px;min-width:58px;text-align:center}
+.jobrow .info{flex:1}
+.jobrow .wor{font-weight:800;font-size:14px}
+.jobrow .addr{font-size:12px;color:#556}
+.jobrow .meta{font-size:11px;color:#889;margin-top:2px}
+.pill{display:inline-block;font-size:10px;font-weight:800;border-radius:8px;padding:2px 7px;color:#fff}
+.pill.b62{background:var(--blue)} .pill.b100{background:#6b4fd8} .pill.b7{background:#e28b00}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.ghost{background:#fff;color:var(--blue);border:2px solid var(--blue)}
+.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:10px;font-size:13px;border-radius:10px;width:auto;display:inline-block}
+.btn.yellow{background:var(--yellow);color:#333}
+.btn:disabled{opacity:.4}
+label{font-size:12px;font-weight:700;color:#556;display:block;margin:10px 0 4px}
+input[type=text],input[type=number],input[type=date],select{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:13px;font-size:16px;background:#fff}
+input:focus{outline:2px solid var(--blue)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.kv:last-child{border:0}
+.kv b{text-align:right}
+.qty{display:flex;gap:10px;margin-top:8px}
+.qty button{flex:1;border:2px solid var(--line);background:#fff;border-radius:12px;padding:18px 6px;font-size:17px;font-weight:800;cursor:pointer}
+.qty button.sel{border-color:var(--blue);background:#e6f5fc;color:var(--blue)}
+.prog{display:flex;gap:5px;margin:4px 0 14px}
+.prog i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.prog i.done{background:var(--green)} .prog i.now{background:var(--blue)}
+.batt-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.batt-tabs button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:9px 0;flex:1;min-width:64px;font-weight:800;font-size:13px;cursor:pointer}
+.batt-tabs button.sel{border-color:var(--blue);background:#e6f5fc;color:var(--blue)}
+.batt-tabs button.ok{border-color:var(--green);color:var(--green)}
+.batt-tabs button.ok.sel{background:#eef8e3}
+.scanbox{border:2px dashed var(--blue);border-radius:14px;padding:14px;text-align:center;margin-top:6px;background:#f2fafe}
+.scanbox .cam{font-size:30px}
+.scanline{position:relative;height:64px;background:#26323a;border-radius:10px;overflow:hidden;margin:8px 0;color:#9fd8f2;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:15px;letter-spacing:2px}
+.scanline::after{content:"";position:absolute;left:0;right:0;height:2px;background:var(--red);animation:scan 1.2s linear infinite}
+@keyframes scan{0%{top:8%}50%{top:88%}100%{top:8%}}
+.confirmbar{background:#eef8e3;border:1.5px solid var(--green);border-radius:12px;padding:11px;display:flex;align-items:center;gap:10px;margin-top:8px}
+.confirmbar b{font-family:ui-monospace,monospace;font-size:16px}
+.footer{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;z-index:9}
+.footer .btn{margin:0}
+.note{font-size:11.5px;color:#889;margin-top:8px;line-height:1.45}
+.namegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.namegrid button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:18px 8px;font-size:15px;font-weight:700;cursor:pointer}
+.namegrid button:active{border-color:var(--blue)}
+.big-ok{font-size:56px;text-align:center;margin:22px 0 6px}
+.center{text-align:center}
+.summary-batt{font-family:ui-monospace,monospace;font-size:12.5px;background:#f7f9fa;border-radius:8px;padding:8px;margin-top:6px}
+.warn{background:#fff8dc;border:1.5px solid var(--yellow);border-radius:10px;padding:10px;font-size:12.5px;margin-top:8px}
+.mismatch{background:#fdf0ef;border:1.5px solid var(--red);border-radius:10px;padding:10px;font-size:12.5px;margin-top:8px;display:none}
+.demo-tag{position:fixed;top:64px;right:8px;background:var(--yellow);color:#333;font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px;z-index:11;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.today-row{display:flex;gap:8px}
+.today-row input{flex:1}
+.today-row .btn{width:auto;margin:0;padding:12px 16px}
+.gps{display:flex;align-items:center;gap:8px;color:#556;font-size:12.5px;margin-bottom:10px}
+.gps .dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin-top:4px}
+.seg button{flex:1;border:0;background:#fff;padding:11px;font-weight:700;font-size:13px;cursor:pointer;color:#667}
+.seg button.sel{background:var(--blue);color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <img id="logo" alt="Perfect Power">
+  <div class="t">Battery App<br><small>Perfect Power Tech Team</small></div>
+  <span class="badge" id="netbadge">ONLINE</span>
+</header>
+<div class="demo-tag">DEMO - dummy data</div>
+
+<section class="screen on" id="s-name">
+  <h2>G'day. Who are you?</h2>
+  <p class="sub">One-time setup - the app remembers you after this.</p>
+  <div class="namegrid">
+    <button onclick="pickName('Luke C')">Luke C</button>
+    <button onclick="pickName('Jonesy')">Jonesy</button>
+    <button onclick="pickName('Big Luke')">Big Luke</button>
+    <button onclick="pickName('Robbo')">Robbo</button>
+  </div>
+  <p class="note">No logins. No passwords. Pick your name once and never see this screen again.</p>
+</section>
+
+<section class="screen" id="s-jobs">
+  <h2>Battery jobs near you</h2>
+  <div class="gps"><span class="dot"></span>Using your location - node sites within 800 m</div>
+  <div class="card tap" onclick="pickJob(0)">
+    <div class="jobrow"><div class="dist">120 m</div>
+      <div class="info"><div class="wor">WOR201311802073 <span class="pill b62">62A</span></div>
+      <div class="addr">Cnr Pittwater Rd &amp; Winbourne Rd, Brookvale</div>
+      <div class="meta">INC000091234567 - Novus says 4 batteries</div></div></div>
+  </div>
+  <div class="card tap" onclick="pickJob(1)">
+    <div class="jobrow"><div class="dist">450 m</div>
+      <div class="info"><div class="wor">WOR201332293438 <span class="pill b7">7A</span></div>
+      <div class="addr">88 Fisher Rd, Dee Why</div>
+      <div class="meta">INC000091198822 - Novus says 8 batteries</div></div></div>
+  </div>
+  <div class="card tap" onclick="pickJob(2)">
+    <div class="jobrow"><div class="dist">790 m</div>
+      <div class="info"><div class="wor">WOR201303348444 <span class="pill b100">100A</span></div>
+      <div class="addr">12 Ocean St, Narraweena</div>
+      <div class="meta">INC000090877310 - Novus says 4 batteries</div></div></div>
+  </div>
+  <label>Not listed? Type the WOR number (no "WOR" needed)</label>
+  <div class="today-row">
+    <input type="text" id="manualwor" inputmode="numeric" placeholder="e.g. 201311802073">
+    <button class="btn primary" onclick="manualJob()">Go</button>
+  </div>
+  <p class="note">The job list refreshes itself from Novus - you never copy anything from the portal again.</p>
+</section>
+
+<section class="screen" id="s-confirm">
+  <h2>Confirm the job</h2>
+  <p class="sub">Everything below came in automatically - nothing to write.</p>
+  <div class="card">
+    <div class="kv"><span>WOR</span><b id="c-wor"></b></div>
+    <div class="kv"><span>INC</span><b id="c-inc"></b></div>
+    <div class="kv"><span>Site</span><b id="c-addr"></b></div>
+    <div class="kv"><span>Battery size</span><b id="c-size"></b></div>
+    <div class="kv"><span>Install date</span><b id="c-date">Today ✓</b></div>
+  </div>
+  <div class="card">
+    <label style="margin-top:0">How many batteries are you actually replacing?</label>
+    <div class="qty">
+      <button id="q4" onclick="setQty(4)">4</button>
+      <button id="q8" onclick="setQty(8)">8</button>
+      <button id="qo" onclick="setQty(0)">Other</button>
+    </div>
+    <div class="mismatch" id="mismatch">Novus said <b id="mm-novus"></b> - no drama. The sheet will note the difference automatically so no one calls you about it later.</div>
+  </div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-jobs')">Back</button><button class="btn primary" onclick="startCapture()">Start</button></div>
+</section>
+
+<section class="screen" id="s-new">
+  <div class="prog"><i class="done"></i><i class="now"></i><i></i><i></i></div>
+  <h2>New batteries in</h2>
+  <p class="sub">Tap a battery. Scan what you can, type what you want - your choice every time.</p>
+  <div class="batt-tabs" id="newtabs"></div>
+  <div class="card">
+    <label style="margin-top:0">OCV - pre installation (V)</label>
+    <input type="number" step="0.1" id="n-ocv" placeholder="13.1" inputmode="decimal">
+    <label>Manufacture date - scan the batch sticker</label>
+    <div id="n-domzone">
+      <button class="btn yellow small" onclick="scanDom()">📷 Scan batch sticker</button>
+      <span class="note"> or </span>
+      <input type="text" id="n-dom" placeholder="MMYY e.g. 1125" inputmode="numeric" style="width:130px;display:inline-block">
+    </div>
+    <div id="n-domscan" style="display:none">
+      <div class="scanline">Batch 1125 Last recharge 011125</div>
+      <div class="confirmbar">✅ <div>Batch <b>1125</b> → Nov 2025<br><span class="note" style="margin:0">Batch number on the sheet fills itself.</span></div></div>
+    </div>
+    <label>Serial - etched on the case</label>
+    <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2)">⌨️ Type it</button></div>
+    <div id="n-serscan" style="margin-top:8px">
+      <button class="btn yellow small" onclick="scanSerial()">📷 Read serial</button>
+      <div id="n-serresult" style="display:none">
+        <div class="scanline" id="serline">0013301624</div>
+        <div class="confirmbar">✅ <div>Read: <b id="serval">0013301624</b> - correct? <br><button class="btn small green" onclick="acceptSerial()">Yes, next battery</button> <button class="btn small ghost" onclick="serMode(2)">No, I'll type it</button></div></div>
+      </div>
+    </div>
+    <div id="n-sertype" style="display:none;margin-top:8px">
+      <input type="text" id="n-serial" placeholder="10 digits, e.g. 0013301624" inputmode="numeric" maxlength="10">
+      <button class="btn green small" style="margin-top:8px" onclick="acceptSerial()">Save battery</button>
+    </div>
+    <label>Comment (optional - hardly ever needed)</label>
+    <input type="text" id="n-comment" placeholder="e.g. replacement looks used">
+    <p class="note">📸 A photo is kept automatically either way - if anything's ever queried, the evidence already exists.</p>
+  </div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-confirm')">Back</button><button class="btn primary" onclick="go('s-old')">Old batteries →</button></div>
+</section>
+
+<section class="screen" id="s-old">
+  <div class="prog"><i class="done"></i><i class="done"></i><i class="now"></i><i></i></div>
+  <h2>Old batteries out</h2>
+  <p class="sub">Point the camera at the barcode - serial AND date land together.</p>
+  <div class="batt-tabs" id="oldtabs"></div>
+  <div class="card">
+    <button class="btn yellow small" onclick="scanOld()">📷 Scan barcode</button>
+    <div id="o-scan" style="display:none">
+      <div class="scanline">▮▮ ▮ ▮▮▮ N2002172977 ▮ ▮▮ ▮▮</div>
+      <div class="confirmbar">✅ <div><b>N2002172977</b> - Mfg 17 Feb 2020<br><span class="note" style="margin:0">Both fields filled from one scan.</span><br><button class="btn small green" onclick="acceptOld()">Next battery</button></div></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div><label>Or type serial</label><input type="text" id="o-serial" placeholder="N2002172977"></div>
+      <div><label>Mfg date</label><input type="text" id="o-date" placeholder="17Feb20"></div>
+    </div>
+    <button class="btn ghost small" style="margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
+  </div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-new')">Back</button><button class="btn primary" onclick="go('s-string')">String test →</button></div>
+</section>
+
+<section class="screen" id="s-string">
+  <div class="prog"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i></div>
+  <h2>String test</h2>
+  <p class="sub" id="stringsub">4-battery job - String A only. String B isn't even shown.</p>
+  <div class="card">
+    <div class="row">
+      <div><label>String A Voltage (V)</label><input type="number" step="0.1" placeholder="52.0" inputmode="decimal"></div>
+      <div><label>String A Current (A)</label><input type="number" step="0.1" placeholder="5.9" inputmode="decimal"></div>
+    </div>
+    <div class="row" id="stringB" style="display:none">
+      <div><label>String B Voltage (V)</label><input type="number" step="0.1" placeholder="52.0" inputmode="decimal"></div>
+      <div><label>String B Current (A)</label><input type="number" step="0.1" placeholder="5.9" inputmode="decimal"></div>
+    </div>
+  </div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-old')">Back</button><button class="btn primary" onclick="buildSummary()">Review →</button></div>
+</section>
+
+<section class="screen" id="s-review">
+  <h2>Done. Check and send.</h2>
+  <p class="sub">This becomes the official spreadsheet - named, filed and emailed for you.</p>
+  <div class="card" id="sumcard"></div>
+  <div class="warn">📶 No signal? Doesn't matter. It sends itself the moment your phone finds bars.</div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-string')">Back</button><button class="btn green" onclick="submitJob()">Submit job ✓</button></div>
+</section>
+
+<section class="screen" id="s-done">
+  <div class="big-ok">🎉</div>
+  <h2 class="center">Job submitted</h2>
+  <p class="sub center">That's the paperwork done. Wrap up and roll to the next one.</p>
+  <div class="card">
+    <div class="kv"><span>Spreadsheet</span><b id="d-file"></b></div>
+    <div class="kv"><span>Filed to</span><b>nbn Drive → WOR folder</b></div>
+    <div class="kv"><span>Email to nbn@</span><b>Sent - xlsx + photos attached</b></div>
+    <div class="kv"><span>Completed by</span><b id="d-tech"></b></div>
+    <div class="kv"><span>Pens used</span><b>0 🖊️🚫</b></div>
+  </div>
+  <button class="btn primary" onclick="location.reload()">Restart demo</button>
+</section>
+
+<script src="logo.js"></script>
+<script>
+const jobs=[
+ {wor:"WOR201311802073",inc:"INC000091234567",addr:"Cnr Pittwater Rd & Winbourne Rd, Brookvale",size:"62A",qty:4},
+ {wor:"WOR201332293438",inc:"INC000091198822",addr:"88 Fisher Rd, Dee Why",size:"7A",qty:8},
+ {wor:"WOR201303348444",inc:"INC000090877310",addr:"12 Ocean St, Narraweena",size:"100A",qty:4}];
+let st={tech:"",job:null,qty:0,newIdx:0,oldIdx:0,newDone:[],oldDone:[]};
+function go(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function pickName(n){st.tech=n;go('s-jobs');}
+function pickJob(i){st.job=jobs[i];fillConfirm();go('s-confirm');}
+function manualJob(){var v=document.getElementById('manualwor').value.trim();st.job={wor:"WOR"+(v||"201399999999"),inc:"INC000099999999",addr:"(from Novus once synced)",size:"62A",qty:4};fillConfirm();go('s-confirm');}
+function fillConfirm(){var c=st.job;document.getElementById('c-wor').textContent=c.wor;document.getElementById('c-inc').textContent=c.inc;document.getElementById('c-addr').textContent=c.addr;document.getElementById('c-size').textContent=c.size+" ("+c.qty+" batteries per Novus)";setQty(c.qty);}
+function setQty(q){st.qty=q||6;['q4','q8','qo'].forEach(function(id){document.getElementById(id).classList.remove('sel')});document.getElementById(q===4?'q4':q===8?'q8':'qo').classList.add('sel');
+ var mm=document.getElementById('mismatch');if(st.job&&q&&q!==st.job.qty){mm.style.display='block';document.getElementById('mm-novus').textContent=st.job.qty+" batteries";}else mm.style.display='none';}
+function labels(){var n=st.qty===8?8:4;var L=[];for(var i=0;i<n;i++)L.push((i<4?'A':'B')+((i%4)+1));return L;}
+function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;renderTabs('newtabs',st.newIdx,st.newDone);renderTabs('oldtabs',st.oldIdx,st.oldDone);
+ var eight=st.qty===8;document.getElementById('stringB').style.display=eight?'flex':'none';
+ document.getElementById('stringsub').textContent=eight?"8-battery job - both strings, four quick readings.":"4-battery job - String A only. String B isn't even shown.";
+ go('s-new');}
+function renderTabs(id,cur,done){var el=document.getElementById(id);el.innerHTML='';labels().forEach(function(l,i){var b=document.createElement('button');b.textContent=(done.indexOf(i)>=0?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.indexOf(i)>=0)b.classList.add('ok');b.onclick=function(){if(id==='newtabs'){st.newIdx=i;renderTabs(id,i,done);}else{st.oldIdx=i;renderTabs(id,i,done);}};el.appendChild(b);});}
+function scanDom(){document.getElementById('n-domzone').style.display='none';document.getElementById('n-domscan').style.display='block';}
+function serMode(m){document.getElementById('serseg1').classList.toggle('sel',m===1);document.getElementById('serseg2').classList.toggle('sel',m===2);document.getElementById('n-serscan').style.display=m===1?'block':'none';document.getElementById('n-sertype').style.display=m===2?'block':'none';}
+var demoSerials=["0013301624","0013301627","0013310784","0013310808","0013261270","0013280939","0012973151","0012973142"];
+function scanSerial(){var s=demoSerials[st.newIdx%demoSerials.length];document.getElementById('serline').textContent=s;document.getElementById('serval').textContent=s;document.getElementById('n-serresult').style.display='block';}
+function acceptSerial(){if(st.newDone.indexOf(st.newIdx)<0)st.newDone.push(st.newIdx);
+ if(st.newDone.length>=labels().length){renderTabs('newtabs',st.newIdx,st.newDone);go('s-old');}
+ else{st.newIdx=labels().findIndex(function(_,i){return st.newDone.indexOf(i)<0});renderTabs('newtabs',st.newIdx,st.newDone);
+ document.getElementById('n-serresult').style.display='none';document.getElementById('n-ocv').value='';document.getElementById('n-domzone').style.display='block';document.getElementById('n-domscan').style.display='none';document.getElementById('n-serial').value='';}}
+function scanOld(){document.getElementById('o-scan').style.display='block';}
+function acceptOld(){markOld();}
+function oldNA(){markOld();}
+function markOld(){if(st.oldDone.indexOf(st.oldIdx)<0)st.oldDone.push(st.oldIdx);
+ if(st.oldDone.length>=labels().length){renderTabs('oldtabs',st.oldIdx,st.oldDone);go('s-string');}
+ else{st.oldIdx=labels().findIndex(function(_,i){return st.oldDone.indexOf(i)<0});renderTabs('oldtabs',st.oldIdx,st.oldDone);document.getElementById('o-scan').style.display='none';}}
+function buildSummary(){var c=st.job;var f=c.size+"H Battery "+c.wor+".xlsx";
+ var h='<div class="kv"><span>WOR</span><b>'+c.wor+'</b></div><div class="kv"><span>INC</span><b>'+c.inc+'</b></div><div class="kv"><span>Batteries</span><b>'+st.qty+' replaced</b></div><div class="kv"><span>File</span><b>'+f+'</b></div>';
+ h+='<div class="summary-batt">A1 ✓ 13.1V - 1125 - 0013301624<br>A2 ✓ 13.0V - 1125 - 0013301627<br>A3 ✓ 13.1V - 1125 - 0013310784<br>A4 ✓ 13.2V - 1125 - 0013310808'+(st.qty===8?'<br>B1-B4 ✓ captured':'')+'</div>';
+ if(st.qty!==c.qty)h+='<div class="mismatch" style="display:block">Auto-comment added: "Novus stated '+c.qty+' batteries - '+st.qty+' found and replaced onsite."</div>';
+ document.getElementById('sumcard').innerHTML=h;go('s-review');}
+function submitJob(){document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor+".xlsx";document.getElementById('d-tech').textContent=st.tech||"Luke C";go('s-done');}
+setInterval(function(){var b=document.getElementById('netbadge');var off=b.classList.toggle('off');b.textContent=off?'OFFLINE - saving locally':'ONLINE';},9000);
+document.getElementById('logo').src=PP_LOGO;
+</script>
+</body>
+</html>
