@@ -163,8 +163,7 @@ input:focus{outline:2px solid var(--blue)}
 </section>
 
 <section class="screen" id="s-confirm">
-  <h2>Confirm the job</h2>
-  <p class="sub">Everything below came in automatically - nothing to write.</p>
+  <h2>Confirm Job details</h2>
   <div class="card">
     <div class="kv"><span>WOR</span><b id="c-wor"></b></div>
     <div class="kv"><span>INC</span><b id="c-inc"></b></div>
@@ -251,7 +250,7 @@ input:focus{outline:2px solid var(--blue)}
 <section class="screen" id="s-string">
   <div class="prog"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i></div>
   <h2>String test</h2>
-  <p class="sub" id="stringsub">4-battery job - String A only. String B isn't even shown.</p>
+  <p class="sub" id="stringsub">4-battery Job - String A only. String B isn't even shown.</p>
   <div class="card">
     <div class="row">
       <div><label>String A Voltage (V)</label><input type="number" step="0.1" placeholder="52.0" inputmode="decimal"></div>
@@ -270,7 +269,7 @@ input:focus{outline:2px solid var(--blue)}
   <p class="sub">This becomes the official spreadsheet - named, filed and emailed for you.</p>
   <div class="card" id="sumcard"></div>
   <div class="warn">📶 No signal? Doesn't matter. It sends itself the moment your phone finds bars.</div>
-  <div class="footer"><button class="btn ghost" onclick="go('s-string')">Back</button><button class="btn green" onclick="submitJob()">Submit job ✓</button></div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-string')">Back</button><button class="btn green" onclick="submitJob()">Submit Job ✓</button></div>
 </section>
 
 <section class="screen" id="s-done">
@@ -304,7 +303,7 @@ function setQty(q){st.qty=q||6;['q4','q8','qo'].forEach(id=>document.getElementB
 function labels(){const n=st.qty===8?8:4;const L=[];for(let i=0;i<n;i++)L.push((i<4?'A':'B')+((i%4)+1));return L;}
 function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;renderTabs('newtabs',st.newIdx,st.newDone);renderTabs('oldtabs',st.oldIdx,st.oldDone);
  const eight=st.qty===8;document.getElementById('stringB').style.display=eight?'flex':'none';
- document.getElementById('stringsub').textContent=eight?"8-battery job - both strings, four quick readings.":"4-battery job - String A only. String B isn't even shown.";
+ document.getElementById('stringsub').textContent=eight?"8-battery Job - both strings, four quick readings.":"4-battery Job - String A only. String B isn't even shown.";
  go('s-new');}
 function renderTabs(id,cur,done){const el=document.getElementById(id);el.innerHTML='';labels().forEach((l,i)=>{const b=document.createElement('button');b.textContent=(done.includes(i)?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.includes(i))b.classList.add('ok');b.onclick=()=>{if(id==='newtabs'){st.newIdx=i;renderTabs(id,i,done);}else{st.oldIdx=i;renderTabs(id,i,done);}};el.appendChild(b);});}
 function fmtDate(d){return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
