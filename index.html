@@ -101,10 +101,10 @@ input:focus{outline:2px solid var(--blue)}
   <h2>G'day. Who are you?</h2>
   <p class="sub">One-time setup - the app remembers you after this.</p>
   <div class="namegrid">
-    <button onclick="pickName('Luke C')">Luke C</button>
-    <button onclick="pickName('Jonesy')">Jonesy</button>
     <button onclick="pickName('Big Luke')">Big Luke</button>
-    <button onclick="pickName('Robbo')">Robbo</button>
+    <button onclick="pickName('Baby Luke')">Baby Luke</button>
+    <button onclick="pickName('Medium')">Medium</button>
+    <button onclick="pickName('The Biz')">The Biz</button>
   </div>
   <p class="note">No logins. No passwords. Pick your name once and never see this screen again.</p>
 </section>
@@ -296,7 +296,7 @@ function buildSummary(){var c=st.job;var f=c.size+"H Battery "+c.wor+".xlsx";
  h+='<div class="summary-batt">A1 ✓ 13.1V - 1125 - 0013301624<br>A2 ✓ 13.0V - 1125 - 0013301627<br>A3 ✓ 13.1V - 1125 - 0013310784<br>A4 ✓ 13.2V - 1125 - 0013310808'+(st.qty===8?'<br>B1-B4 ✓ captured':'')+'</div>';
  if(st.qty!==c.qty)h+='<div class="mismatch" style="display:block">Auto-comment added: "Novus stated '+c.qty+' batteries - '+st.qty+' found and replaced onsite."</div>';
  document.getElementById('sumcard').innerHTML=h;go('s-review');}
-function submitJob(){document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor+".xlsx";document.getElementById('d-tech').textContent=st.tech||"Luke C";go('s-done');}
+function submitJob(){document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor+".xlsx";document.getElementById('d-tech').textContent=st.tech||"Medium";go('s-done');}
 setInterval(function(){var b=document.getElementById('netbadge');var off=b.classList.toggle('off');b.textContent=off?'OFFLINE - saving locally':'ONLINE';},9000);
 document.getElementById('logo').src=PP_LOGO;
 </script>
