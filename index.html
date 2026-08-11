@@ -35,8 +35,10 @@ h2{font-size:20px;margin:6px 0 2px}
 .jobrow .wor{font-weight:800;font-size:14px}
 .jobrow .addr{font-size:12px;color:#556}
 .jobrow .meta{font-size:11px;color:#889;margin-top:2px}
-.pill{display:inline-block;font-size:10px;font-weight:800;border-radius:8px;padding:2px 7px;color:#fff}
-.pill.b62{background:var(--blue)} .pill.b100{background:#6b4fd8} .pill.b7{background:#e28b00}
+.pill{display:inline-block;font-size:11px;font-weight:800;border-radius:8px;padding:3px 8px;color:#fff}
+.jobrow>.pill{margin-left:auto;flex-shrink:0;min-width:38px;text-align:center}
+.pill.b62{background:#2c88b0} .pill.b100{background:#7b6abc} .pill.b7{background:#b5812d}
+.copybtn{border:0;background:none;color:#8aa;font-size:14px;cursor:pointer;padding:0 4px;vertical-align:middle}
 .btn{display:block;width:100%;border:0;border-radius:14px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px}
 .btn.primary{background:var(--blue);color:#fff}
 .btn.ghost{background:#fff;color:var(--blue);border:2px solid var(--blue)}
@@ -106,7 +108,7 @@ input:focus{outline:2px solid var(--blue)}
   <h2>G'day. Who are you?</h2>
   <p class="sub">One-time ask, and I'll know who you are from now on</p>
   <div class="namegrid">
-    <button onclick="pickName('It&#39;s me')">It's me</button>
+    <button onclick="pickName(this.textContent)">It's me</button>
     <button onclick="pickName('Big Luke')">Big Luke</button>
     <button onclick="pickName('Ian')">Ian</button>
     <button onclick="pickName('Medium')">Medium</button>
@@ -126,25 +128,28 @@ input:focus{outline:2px solid var(--blue)}
 </section>
 
 <section class="screen" id="s-jobs">
-  <h2>Battery jobs near you</h2>
-  <div class="gps"><span class="dot"></span>Using your location - node sites within 800 m</div>
+  <h2>Battery Jobs near you</h2>
+  <div class="gps"><span class="dot"></span><span id="gpstext">Using your location - sites within 800 m</span><button class="refresh" id="refreshbtn" onclick="refreshJobs()">↻ Refresh</button></div>
   <div class="card tap" onclick="pickJob(0)">
     <div class="jobrow"><div class="dist near">120 m</div>
-      <div class="info"><div class="wor">WOR201311802073 <span class="pill b62">62A</span></div>
+      <div class="info"><div class="wor">WOR201311802073 <button class="copybtn" onclick="copyWor(event,'WOR201311802073',this)">⧉</button></div>
       <div class="addr">Cnr Pittwater Rd &amp; Winbourne Rd, Brookvale</div>
-      <div class="meta">INC000091234567 - Novus says 4 batteries</div></div></div>
+      <div class="meta">INC000091234567 - 4 Batteries</div></div>
+      <span class="pill b62">62A</span></div>
   </div>
   <div class="card tap" onclick="pickJob(1)">
     <div class="jobrow"><div class="dist mid">450 m</div>
-      <div class="info"><div class="wor">WOR201332293438 <span class="pill b7">7A</span></div>
+      <div class="info"><div class="wor">WOR201332293438 <button class="copybtn" onclick="copyWor(event,'WOR201332293438',this)">⧉</button></div>
       <div class="addr">88 Fisher Rd, Dee Why</div>
-      <div class="meta">INC000091198822 - Novus says 8 batteries</div></div></div>
+      <div class="meta">INC000091198822 - 8 Batteries</div></div>
+      <span class="pill b7">7A</span></div>
   </div>
   <div class="card tap" onclick="pickJob(2)">
     <div class="jobrow"><div class="dist far">790 m</div>
-      <div class="info"><div class="wor">WOR201303348444 <span class="pill b100">100A</span></div>
+      <div class="info"><div class="wor">WOR201303348444 <button class="copybtn" onclick="copyWor(event,'WOR201303348444',this)">⧉</button></div>
       <div class="addr">12 Ocean St, Narraweena</div>
-      <div class="meta">INC000090877310 - Novus says 4 batteries</div></div></div>
+      <div class="meta">INC000090877310 - 4 Batteries</div></div>
+      <span class="pill b100">100A</span></div>
   </div>
   <label>Not listed? Type the WOR number (no "WOR" needed)</label>
   <div class="today-row">
@@ -280,40 +285,53 @@ const jobs=[
  {wor:"WOR201332293438",inc:"INC000091198822",addr:"88 Fisher Rd, Dee Why",size:"7A",qty:8},
  {wor:"WOR201303348444",inc:"INC000090877310",addr:"12 Ocean St, Narraweena",size:"100A",qty:4}];
 let st={tech:"",job:null,qty:0,newIdx:0,oldIdx:0,newDone:[],oldDone:[]};
-function go(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
 function pickName(n){st.tech=n;go('s-jobs');}
 function pickJob(i){st.job=jobs[i];fillConfirm();go('s-confirm');}
-function manualJob(){var v=document.getElementById('manualwor').value.trim();st.job={wor:"WOR"+(v||"201399999999"),inc:"INC000099999999",addr:"(from Novus once synced)",size:"62A",qty:4};fillConfirm();go('s-confirm');}
-function fillConfirm(){var c=st.job;document.getElementById('c-wor').textContent=c.wor;document.getElementById('c-inc').textContent=c.inc;document.getElementById('c-addr').textContent=c.addr;document.getElementById('c-size').textContent=c.size+" ("+c.qty+" batteries per Novus)";setQty(c.qty);}
-function setQty(q){st.qty=q||6;['q4','q8','qo'].forEach(function(id){document.getElementById(id).classList.remove('sel')});document.getElementById(q===4?'q4':q===8?'q8':'qo').classList.add('sel');
- var mm=document.getElementById('mismatch');if(st.job&&q&&q!==st.job.qty){mm.style.display='block';document.getElementById('mm-novus').textContent=st.job.qty+" batteries";}else mm.style.display='none';}
-function labels(){var n=st.qty===8?8:4;var L=[];for(var i=0;i<n;i++)L.push((i<4?'A':'B')+((i%4)+1));return L;}
+function manualJob(){const v=document.getElementById('manualwor').value.trim();st.job={wor:"WOR"+(v||"201399999999"),inc:"INC000099999999",addr:"(from Novus once synced)",size:"62A",qty:4};fillConfirm();go('s-confirm');}
+function fillConfirm(){c=st.job;document.getElementById('c-wor').textContent=c.wor;document.getElementById('c-inc').textContent=c.inc;document.getElementById('c-addr').textContent=c.addr;document.getElementById('c-size').textContent=c.size+" ("+c.qty+" batteries per Novus)";setQty(c.qty);}
+function setQty(q){st.qty=q||6;['q4','q8','qo'].forEach(id=>document.getElementById(id).classList.remove('sel'));(q===4?q4:q===8?q8:qo).classList.add('sel');
+ const mm=document.getElementById('mismatch');if(st.job&&q&&q!==st.job.qty){mm.style.display='block';document.getElementById('mm-novus').textContent=st.job.qty+" batteries";}else mm.style.display='none';}
+function labels(){const n=st.qty===8?8:4;const L=[];for(let i=0;i<n;i++)L.push((i<4?'A':'B')+((i%4)+1));return L;}
 function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;renderTabs('newtabs',st.newIdx,st.newDone);renderTabs('oldtabs',st.oldIdx,st.oldDone);
- var eight=st.qty===8;document.getElementById('stringB').style.display=eight?'flex':'none';
+ const eight=st.qty===8;document.getElementById('stringB').style.display=eight?'flex':'none';
  document.getElementById('stringsub').textContent=eight?"8-battery job - both strings, four quick readings.":"4-battery job - String A only. String B isn't even shown.";
  go('s-new');}
-function renderTabs(id,cur,done){var el=document.getElementById(id);el.innerHTML='';labels().forEach(function(l,i){var b=document.createElement('button');b.textContent=(done.indexOf(i)>=0?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.indexOf(i)>=0)b.classList.add('ok');b.onclick=function(){if(id==='newtabs'){st.newIdx=i;renderTabs(id,i,done);}else{st.oldIdx=i;renderTabs(id,i,done);}};el.appendChild(b);});}
+function renderTabs(id,cur,done){const el=document.getElementById(id);el.innerHTML='';labels().forEach((l,i)=>{const b=document.createElement('button');b.textContent=(done.includes(i)?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.includes(i))b.classList.add('ok');b.onclick=()=>{if(id==='newtabs'){st.newIdx=i;renderTabs(id,i,done);}else{st.oldIdx=i;renderTabs(id,i,done);}};el.appendChild(b);});}
+function refreshJobs(){var b=document.getElementById('refreshbtn');var g=document.getElementById('gpstext');
+ b.classList.add('spinning');b.textContent='↻ Updating...';g.textContent='Checking your location...';
+ setTimeout(function(){
+   var dists=document.querySelectorAll('.dist');
+   dists[0].textContent='85 m';dists[1].textContent='410 m';dists[2].textContent='820 m';
+   b.classList.remove('spinning');b.textContent='↻ Refresh';
+   g.textContent='Updated just now - sites within 800 m';
+ },900);}
+function copyWor(e, wor, btn){e.stopPropagation();
+ function done(){btn.textContent='✓';setTimeout(function(){btn.textContent='⧉';},1200);}
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(wor).then(done).catch(function(){fallbackCopy(wor);done();});}
+ else{fallbackCopy(wor);done();}}
+function fallbackCopy(text){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(err){}document.body.removeChild(ta);}
 function scanDom(){document.getElementById('n-domzone').style.display='none';document.getElementById('n-domscan').style.display='block';}
 function serMode(m){document.getElementById('serseg1').classList.toggle('sel',m===1);document.getElementById('serseg2').classList.toggle('sel',m===2);document.getElementById('n-serscan').style.display=m===1?'block':'none';document.getElementById('n-sertype').style.display=m===2?'block':'none';}
-var demoSerials=["0013301624","0013301627","0013310784","0013310808","0013261270","0013280939","0012973151","0012973142"];
-function scanSerial(){var s=demoSerials[st.newIdx%demoSerials.length];document.getElementById('serline').textContent=s;document.getElementById('serval').textContent=s;document.getElementById('n-serresult').style.display='block';}
-function acceptSerial(){if(st.newDone.indexOf(st.newIdx)<0)st.newDone.push(st.newIdx);
+const demoSerials=["0013301624","0013301627","0013310784","0013310808","0013261270","0013280939","0012973151","0012973142"];
+function scanSerial(){const s=demoSerials[st.newIdx%demoSerials.length];document.getElementById('serline').textContent=s;document.getElementById('serval').textContent=s;document.getElementById('n-serresult').style.display='block';}
+function acceptSerial(){if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
  if(st.newDone.length>=labels().length){renderTabs('newtabs',st.newIdx,st.newDone);go('s-old');}
- else{st.newIdx=labels().findIndex(function(_,i){return st.newDone.indexOf(i)<0});renderTabs('newtabs',st.newIdx,st.newDone);
+ else{st.newIdx=labels().findIndex((_,i)=>!st.newDone.includes(i));renderTabs('newtabs',st.newIdx,st.newDone);
  document.getElementById('n-serresult').style.display='none';document.getElementById('n-ocv').value='';document.getElementById('n-domzone').style.display='block';document.getElementById('n-domscan').style.display='none';document.getElementById('n-serial').value='';}}
 function scanOld(){document.getElementById('o-scan').style.display='block';}
 function acceptOld(){markOld();}
 function oldNA(){markOld();}
-function markOld(){if(st.oldDone.indexOf(st.oldIdx)<0)st.oldDone.push(st.oldIdx);
+function markOld(){if(!st.oldDone.includes(st.oldIdx))st.oldDone.push(st.oldIdx);
  if(st.oldDone.length>=labels().length){renderTabs('oldtabs',st.oldIdx,st.oldDone);go('s-string');}
- else{st.oldIdx=labels().findIndex(function(_,i){return st.oldDone.indexOf(i)<0});renderTabs('oldtabs',st.oldIdx,st.oldDone);document.getElementById('o-scan').style.display='none';}}
-function buildSummary(){var c=st.job;var f=c.size+"H Battery "+c.wor+".xlsx";
- var h='<div class="kv"><span>WOR</span><b>'+c.wor+'</b></div><div class="kv"><span>INC</span><b>'+c.inc+'</b></div><div class="kv"><span>Batteries</span><b>'+st.qty+' replaced</b></div><div class="kv"><span>File</span><b>'+f+'</b></div>';
+ else{st.oldIdx=labels().findIndex((_,i)=>!st.oldDone.includes(i));renderTabs('oldtabs',st.oldIdx,st.oldDone);document.getElementById('o-scan').style.display='none';}}
+function buildSummary(){const c=st.job;const f=c.size+"H Battery "+c.wor+".xlsx";
+ let h='<div class="kv"><span>WOR</span><b>'+c.wor+'</b></div><div class="kv"><span>INC</span><b>'+c.inc+'</b></div><div class="kv"><span>Batteries</span><b>'+st.qty+' replaced</b></div><div class="kv"><span>File</span><b>'+f+'</b></div>';
  h+='<div class="summary-batt">A1 ✓ 13.1V - 1125 - 0013301624<br>A2 ✓ 13.0V - 1125 - 0013301627<br>A3 ✓ 13.1V - 1125 - 0013310784<br>A4 ✓ 13.2V - 1125 - 0013310808'+(st.qty===8?'<br>B1-B4 ✓ captured':'')+'</div>';
  if(st.qty!==c.qty)h+='<div class="mismatch" style="display:block">Auto-comment added: "Novus stated '+c.qty+' batteries - '+st.qty+' found and replaced onsite."</div>';
  document.getElementById('sumcard').innerHTML=h;go('s-review');}
 function submitJob(){document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor+".xlsx";document.getElementById('d-tech').textContent=st.tech||"Medium";go('s-done');}
-setInterval(function(){var b=document.getElementById('netbadge');var off=b.classList.toggle('off');b.textContent=off?'OFFLINE - saving locally':'ONLINE';},9000);
+setInterval(()=>{const b=document.getElementById('netbadge');const off=b.classList.toggle('off');b.textContent=off?'OFFLINE - saving locally':'ONLINE';},9000);
 document.getElementById('logo').src=PP_LOGO;
 </script>
 </body>
