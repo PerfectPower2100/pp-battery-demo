@@ -299,7 +299,7 @@ function pickJob(i){st.job=jobs[i];fillConfirm();go('s-confirm');}
 function manualJob(){const v=document.getElementById('manualwor').value.trim();st.job={wor:"WOR"+(v||"201399999999"),inc:"INC000099999999",addr:"(from Novus once synced)",size:"62A",qty:4};fillConfirm();go('s-confirm');}
 function fillConfirm(){c=st.job;document.getElementById('c-wor').textContent=c.wor;document.getElementById('c-inc').textContent=c.inc;document.getElementById('c-addr').textContent=c.addr;document.getElementById('c-size').textContent=c.size+" ("+c.qty+" batteries per Novus)";setQty(c.qty);}
 function setQty(q){st.qty=q||6;['q4','q8','qo'].forEach(id=>document.getElementById(id).classList.remove('sel'));(q===4?q4:q===8?q8:qo).classList.add('sel');
- const mm=document.getElementById('mismatch');if(st.job&&q&&q!==st.job.qty){mm.style.display='block';document.getElementById('mm-novus').textContent=st.job.qty+" Batteries";}else mm.style.display='none';}
+ const mm=document.getElementById('mismatch');if(st.job&&q!==st.job.qty){mm.style.display='block';document.getElementById('mm-novus').textContent=st.job.qty+" Batteries";}else mm.style.display='none';}
 function labels(){const n=st.qty===8?8:4;const L=[];for(let i=0;i<n;i++)L.push((i<4?'A':'B')+((i%4)+1));return L;}
 function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;renderTabs('newtabs',st.newIdx,st.newDone);renderTabs('oldtabs',st.oldIdx,st.oldDone);
  const eight=st.qty===8;document.getElementById('stringB').style.display=eight?'flex':'none';
