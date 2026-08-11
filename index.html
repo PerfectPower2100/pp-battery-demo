@@ -70,8 +70,8 @@ input:focus{outline:2px solid var(--blue)}
 .footer .btn{margin:0}
 .note{font-size:11.5px;color:#889;margin-top:8px;line-height:1.45}
 .namegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.namegrid button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:18px 8px;font-size:15px;font-weight:700;cursor:pointer}
-.namegrid button:active{border-color:var(--blue)}
+.namegrid button{border:0;border-radius:12px;padding:18px 8px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.namegrid button:active{transform:scale(.97)}
 .big-ok{font-size:56px;text-align:center;margin:22px 0 6px}
 .center{text-align:center}
 .summary-batt{font-family:ui-monospace,monospace;font-size:12.5px;background:#f7f9fa;border-radius:8px;padding:8px;margin-top:6px}
@@ -101,22 +101,22 @@ input:focus{outline:2px solid var(--blue)}
   <h2>G'day. Who are you?</h2>
   <p class="sub">One-time ask, and I'll know who you are from now on</p>
   <div class="namegrid">
-    <button onclick="pickName('It&#39;s me')">It's me</button>
-    <button onclick="pickName('Big Luke')">Big Luke</button>
-    <button onclick="pickName('Ian')">Ian</button>
-    <button onclick="pickName('Medium')">Medium</button>
-    <button onclick="pickName('Mitch')">Mitch</button>
-    <button onclick="pickName('Baby Luke')">Baby Luke</button>
-    <button onclick="pickName('The Biz')">The Biz</button>
-    <button onclick="pickName('Rhys')">Rhys</button>
-    <button onclick="pickName('Harri')">Harri</button>
-    <button onclick="pickName('Charlie')">Charlie</button>
-    <button onclick="pickName('Cam')">Cam</button>
-    <button onclick="pickName('Kai')">Kai</button>
-    <button onclick="pickName('Brae')">Brae</button>
-    <button onclick="pickName('Beau')">Beau</button>
-    <button onclick="pickName('Seb')">Seb</button>
-    <button onclick="pickName('New Luke')">New Luke</button>
+    <button onclick="pickName('It&#39;s me')" style="background:#ffddb7;color:#333">It's me</button>
+    <button onclick="pickName('Big Luke')" style="background:#5fa7ed;color:#fff">Big Luke</button>
+    <button onclick="pickName('Ian')" style="background:#33a99e;color:#fff">Ian</button>
+    <button onclick="pickName('Medium')" style="background:#7ad4ad;color:#fff">Medium</button>
+    <button onclick="pickName('Mitch')" style="background:#97e1ea;color:#333">Mitch</button>
+    <button onclick="pickName('Baby Luke')" style="background:#757575;color:#fff">Baby Luke</button>
+    <button onclick="pickName('The Biz')" style="background:#4c6985;color:#fff">The Biz</button>
+    <button onclick="pickName('Rhys')" style="background:#fb6765;color:#fff">Rhys</button>
+    <button onclick="pickName('Harri')" style="background:#2fa9b8;color:#fff">Harri</button>
+    <button onclick="pickName('Charlie')" style="background:#d9c8f2;color:#333">Charlie</button>
+    <button onclick="pickName('Cam')" style="background:#f2c8d5;color:#333">Cam</button>
+    <button onclick="pickName('Kai')" style="background:#6ea627;color:#fff">Kai</button>
+    <button onclick="pickName('Brae')" style="background:#c3ddf5;color:#333">Brae</button>
+    <button onclick="pickName('Beau')" style="background:#f2e3a9;color:#333">Beau</button>
+    <button onclick="pickName('Seb')" style="background:#9269e1;color:#fff">Seb</button>
+    <button onclick="pickName('New Luke')" style="background:#ffddb7;color:#333">New Luke</button>
   </div>
 </section>
 
