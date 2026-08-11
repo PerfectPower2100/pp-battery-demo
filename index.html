@@ -165,7 +165,7 @@ input:focus{outline:2px solid var(--blue)}
 <section class="screen" id="s-confirm">
   <h2>Confirm Job details</h2>
   <div class="card">
-    <div class="kv"><span>WOR</span><b id="c-wor"></b></div>
+    <div class="kv"><span>WOR</span><span style="display:flex;align-items:center;gap:2px"><b id="c-wor"></b><button class="copybtn" onclick="copyWor(event, st.job.wor, this)">⧉</button></span></div>
     <div class="kv"><span>INC</span><b id="c-inc"></b></div>
     <div class="kv"><span>Site</span><b id="c-addr"></b></div>
     <div class="kv"><span>Battery size</span><b id="c-size"></b></div>
