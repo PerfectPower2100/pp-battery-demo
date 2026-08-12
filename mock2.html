@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Mock-up 2 - One Thing at a Time</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#fff;color:#1b2733;max-width:480px;margin:0 auto;min-height:100vh}
+.tag{position:fixed;top:10px;right:10px;background:#1b2733;color:#fff;font-size:11px;font-weight:800;padding:5px 10px;border-radius:20px;z-index:50}
+.top{padding:18px 22px 0}
+.crumb{font-size:13px;font-weight:800;color:#0099db;letter-spacing:.5px;text-transform:uppercase}
+.pbar{height:6px;background:#edf1f5;border-radius:3px;margin:12px 0 0;overflow:hidden}
+.pbar i{display:block;height:100%;background:#0099db;border-radius:3px;transition:width .3s}
+.stage{padding:26px 22px 150px}
+h1{font-size:30px;line-height:1.15;margin:0 0 8px;font-weight:800}
+.hint{font-size:16px;color:#5b6b7b;margin:0 0 26px;line-height:1.4}
+.bigin{width:100%;border:3px solid #dbe4ec;border-radius:18px;padding:22px;font-size:34px;font-weight:800;text-align:center;color:#1b2733}
+.bigin:focus{outline:none;border-color:#0099db}
+.campanel{border:3px dashed #0099db;background:#f2fafe;border-radius:22px;padding:34px 20px;text-align:center;cursor:pointer}
+.campanel .ico{font-size:54px}
+.campanel .t{font-size:20px;font-weight:800;margin-top:10px}
+.readout{background:#122430;border-radius:18px;color:#7fe0a8;font-family:ui-monospace,monospace;font-size:24px;letter-spacing:2px;text-align:center;padding:26px 12px;margin-top:14px}
+.readout small{display:block;color:#9fd8f2;font-size:14px;letter-spacing:0;margin-top:6px;font-family:inherit}
+.altlink{display:block;width:100%;text-align:center;margin-top:18px;background:none;border:none;color:#0099db;font-size:17px;font-weight:700;text-decoration:underline;cursor:pointer;padding:12px}
+.choices{display:flex;flex-direction:column;gap:12px}
+.choices button{border:3px solid #dbe4ec;background:#fff;border-radius:18px;padding:20px;font-size:19px;font-weight:800;cursor:pointer;text-align:center;color:#1b2733}
+.choices button:active{border-color:#0099db;background:#f2fafe}
+.namewrap{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.namewrap button{border:3px solid #dbe4ec;background:#fff;border-radius:18px;padding:20px 6px;font-size:17px;font-weight:800;cursor:pointer}
+.jobcard{border:3px solid #dbe4ec;border-radius:22px;padding:22px;margin-bottom:14px}
+.jobcard .wor{font-size:20px;font-weight:800}
+.jobcard .addr{font-size:16px;color:#5b6b7b;margin-top:4px}
+.jobcard .meta{font-size:15px;color:#0099db;font-weight:800;margin-top:10px}
+.dock{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;padding:14px 18px 22px;background:linear-gradient(to top,#fff 75%,rgba(255,255,255,0));z-index:40}
+.go{display:block;width:100%;border:0;border-radius:20px;padding:24px;font-size:21px;font-weight:800;cursor:pointer;background:#79b829;color:#fff;box-shadow:0 6px 18px rgba(121,184,41,.35)}
+.go.blue{background:#0099db;box-shadow:0 6px 18px rgba(0,153,219,.3)}
+.go:disabled{background:#cfd9e2;box-shadow:none}
+.tickrow{display:flex;align-items:center;gap:14px;border-bottom:2px solid #edf1f5;padding:14px 0;font-size:17px}
+.tickrow b{font-family:ui-monospace,monospace}
+.bigok{font-size:74px;text-align:center;margin:40px 0 10px}
+.donebox{border:3px solid #79b829;background:#f4faec;border-radius:22px;padding:20px;font-size:16px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="tag">MOCK-UP #2</div>
+<div class="top"><div class="crumb" id="crumb">Welcome</div><div class="pbar"><i id="pfill" style="width:2%"></i></div></div>
+<div class="stage" id="stage"></div>
+<div class="dock" id="dock"></div>
+<script>
+const S={tech:'',bi:0,phase:0,data:[]};
+const BATTS=['A1','A2','A3','A4'];
+const SERS=['0013301624','0013301627','0013310784','0013310808'];
+const OLDS=[['N2002172977','Feb 2020'],['N2002172981','Feb 2020'],['N2001988014','Dec 2019'],['N2002171205','Feb 2020']];
+let step=0;
+const el=id=>document.getElementById(id);
+function render(title,hint,bodyHtml,btnLabel,btnFn,crumb,pct,blue){
+ el('crumb').textContent=crumb;el('pfill').style.width=pct+'%';
+ el('stage').innerHTML='<h1>'+title+'</h1>'+(hint?'<p class="hint">'+hint+'</p>':'')+bodyHtml;
+ el('dock').innerHTML=btnLabel?'<button class="go'+(blue?' blue':'')+'" id="gobtn" '+(btnFn?'':'disabled')+'>'+btnLabel+'</button>':'';
+ if(btnFn)el('gobtn').onclick=btnFn;
+ window.scrollTo(0,0);
+}
+function sWho(){
+ const names=['It\'s me','Big Luke','Ian','Medium','Mitch','Baby Luke','The Biz','Rhys','Harri','Charlie','Cam','Kai','Brae','Beau','Seb','New Luke'];
+ render('Who\'s on the tools today?','Tap your name. One tap, never again.',
+ '<div class="namewrap">'+names.map(n=>'<button onclick="S.tech=this.textContent;sJob()">'+n+'</button>').join('')+'</div>',
+ null,null,'Step 1 - You',4);
+}
+function sJob(){
+ render('This your job?','You\'re 120 m from this site, so I\'m guessing yes.',
+ '<div class="jobcard"><div class="wor">WOR201311802073</div><div class="addr">Cnr Pittwater Rd &amp; Winbourne Rd, Brookvale</div><div class="meta">62A · 4 Batteries · INC000091234567</div></div>'+
+ '<div class="choices"><button onclick="sBatStart()">Yes, that\'s the one</button><button onclick="sBatStart()">Pick a different job</button></div>',
+ null,null,'Step 2 - The Job',10);
+}
+function sBatStart(){S.bi=0;S.phase=0;sOCV();}
+function pct(){return 14+Math.round((S.bi*3+S.phase)/(12)*56);}
+function sOCV(){
+ const b=BATTS[S.bi];
+ render('OCV for battery '+b+'?','New battery, before it goes in. Volts only.',
+ '<input class="bigin" id="ocv" type="number" step="0.1" inputmode="decimal" placeholder="13.1">',
+ 'That\'s the reading. Next',()=>{S.phase=1;sSticker();},'New Battery '+b+' · 1 of 3',pct());
+ setTimeout(()=>el('ocv').focus(),50);
+}
+function sSticker(){
+ const b=BATTS[S.bi];
+ render('Snap the batch sticker','Point and tap. The date reads itself.',
+ '<div class="campanel" onclick="stickerDone()"><div class="ico">📷</div><div class="t">Tap to scan</div></div><div id="out"></div>'+
+ '<button class="altlink" onclick="stickerType()">Sticker unreadable? Type it instead</button>',
+ null,null,'New Battery '+b+' · 2 of 3',pct());
+}
+function stickerDone(){
+ el('out').innerHTML='<div class="readout">BATCH 1125<small>= November 2025 · locked in</small></div>';
+ el('dock').innerHTML='<button class="go" onclick="S.phase=2;sSerial()">Date\'s right. Next</button>';
+}
+function stickerType(){
+ el('out').innerHTML='<input class="bigin" id="dm" type="text" inputmode="numeric" placeholder="MMYY" maxlength="4" style="margin-top:14px">';
+ el('dm').focus();
+ el('dock').innerHTML='<button class="go" onclick="S.phase=2;sSerial()">Done. Next</button>';
+}
+function sSerial(){
+ const b=BATTS[S.bi];
+ render('Now the serial','Etched on the case. Same deal - point and tap.',
+ '<div class="campanel" onclick="serialDone()"><div class="ico">📷</div><div class="t">Tap to read serial</div></div><div id="out"></div>'+
+ '<button class="altlink" onclick="serialType()">Can\'t read it? Type it instead</button>',
+ null,null,'New Battery '+b+' · 3 of 3',pct());
+}
+function serialDone(){
+ el('out').innerHTML='<div class="readout">'+SERS[S.bi]+'<small>10 digits · photo kept as proof</small></div>';
+ el('dock').innerHTML='<button class="go" onclick="nextBat()">'+(S.bi<3?'Battery '+BATTS[S.bi]+' done. Next battery':'Last one. Old Batteries now')+'</button>';
+}
+function serialType(){
+ el('out').innerHTML='<input class="bigin" id="sn" type="text" inputmode="numeric" maxlength="10" placeholder="10 digits" style="margin-top:14px;font-size:26px">';
+ el('sn').focus();
+ el('dock').innerHTML='<button class="go" onclick="nextBat()">'+(S.bi<3?'Done. Next battery':'Last one. Old Batteries now')+'</button>';
+}
+function nextBat(){S.bi++;S.phase=0;if(S.bi<4)sOCV();else{S.bi=0;sOld();}}
+function sOld(){
+ const b=BATTS[S.bi];
+ render('Old battery '+b+' - scan the barcode','One scan grabs the serial AND the date together.',
+ '<div class="campanel" onclick="oldDone()"><div class="ico">📷</div><div class="t">Tap to scan barcode</div></div><div id="out"></div>'+
+ '<button class="altlink" onclick="oldNA()">No sticker on this one - mark NA</button>',
+ null,null,'Old Battery '+b,72+S.bi*4);
+}
+function oldDone(){
+ el('out').innerHTML='<div class="readout">'+OLDS[S.bi][0]+'<small>Made '+OLDS[S.bi][1]+' · both fields filled</small></div>';
+ el('dock').innerHTML='<button class="go" onclick="nextOld()">'+(S.bi<3?'Next old battery':'Done. String Test')+'</button>';
+}
+function oldNA(){nextOld();}
+function nextOld(){S.bi++;if(S.bi<4)sOld();else sString();}
+function sString(){
+ render('String Test','Two numbers off the meter and you\'re done.',
+ '<p class="hint" style="margin-bottom:8px">String A Voltage (V)</p><input class="bigin" type="number" inputmode="decimal" placeholder="52.0">'+
+ '<p class="hint" style="margin:20px 0 8px">String A Current (A)</p><input class="bigin" type="number" inputmode="decimal" placeholder="5.9">',
+ 'Readings in. Check the sheet',sReview,'Nearly there',90);
+}
+function sReview(){
+ render('Everything\'s in. Look right?','This becomes the official spreadsheet, filed and emailed for you.',
+ '<div class="tickrow">✅ <span>New Batteries</span><b style="margin-left:auto">4 of 4</b></div>'+
+ '<div class="tickrow">✅ <span>Old Batteries</span><b style="margin-left:auto">4 of 4</b></div>'+
+ '<div class="tickrow">✅ <span>String Test</span><b style="margin-left:auto">A ✓</b></div>'+
+ '<div class="tickrow">📄 <span>62AH Battery WOR201311802073.xlsx</span></div>',
+ 'Send it',sDone,'Final check',96);
+}
+function sDone(){
+ render('','','<div class="bigok">🎉</div><h1 style="text-align:center">Paperwork done, '+(S.tech||'legend')+'</h1>'+
+ '<div class="donebox">📄 Spreadsheet built and named<br>📁 Filed to the nbn Drive WOR folder<br>📧 Emailed to nbn@ with photos<br>🖊️ Pens used: zero</div>',
+ 'Start again (demo)',()=>location.reload(),'Job complete',100,true);
+}
+sWho();
+</script>
+</body>
+</html>
