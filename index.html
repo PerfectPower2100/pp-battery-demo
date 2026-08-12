@@ -202,7 +202,7 @@ input:focus{outline:2px solid var(--blue)}
 <!-- 3: new batteries -->
 <section class="screen" id="s-new">
   <div class="prog"><i class="done"></i><i class="now"></i><i></i><i></i></div>
-  <h2>New batteries in</h2>
+  <h2>New Batteries in</h2>
   <p class="sub">Tap a battery. Scan what you can, type if the scan doesn't register</p>
   <div class="batt-tabs" id="newtabs"></div>
   <div class="card">
@@ -243,20 +243,26 @@ input:focus{outline:2px solid var(--blue)}
 <!-- 4: old batteries -->
 <section class="screen" id="s-old">
   <div class="prog"><i class="done"></i><i class="done"></i><i class="now"></i><i></i></div>
-  <h2>Old batteries out</h2>
-  <p class="sub">Point the camera at the barcode - serial AND date land together.</p>
+  <h2>Old Batteries out</h2>
+  <p class="sub">Tap a battery. Scan the barcode with your camera, or type it in below</p>
   <div class="batt-tabs" id="oldtabs"></div>
   <div class="card">
     <div class="reviewbar" id="oldreview"></div>
     <div class="warn" id="o-nabar" style="display:none">🚫 This one was marked NA - no sticker.</div>
-    <button class="btn yellow small" style="display:block;width:100%" onclick="scanOld()">📷 Scan barcode</button>
-    <div id="o-scan" style="display:none">
-      <div class="scanline" id="oldline">▮▮ ▮ ▮▮▮ N2002172977 ▮ ▮▮ ▮▮</div>
-      <div class="confirmbar">✅ <div><b id="oldval">N2002172977</b> - Mfg <span id="olddate">17 Feb 2020</span><br><span class="note" style="margin:0">Both fields filled from one scan.</span></div></div>
+    <label style="margin-top:0;font-weight:800">Serial Number and Manufacture Date - one scan of the barcode fills in both</label>
+    <div class="seg"><button id="oldseg1" class="sel" onclick="oldMode(1)">📷 Camera read</button><button id="oldseg2" onclick="oldMode(2,1)">⌨️ Type it</button></div>
+    <div id="o-camzone" style="margin-top:8px">
+      <button class="btn yellow small" style="display:block;width:100%" onclick="scanOld()">📷 Scan barcode</button>
+      <div id="o-scan" style="display:none">
+        <div class="scanline" id="oldline">▮▮ ▮ ▮▮▮ N2002172977 ▮ ▮▮ ▮▮</div>
+        <div class="confirmbar">✅ <div><b id="oldval">N2002172977</b> - Mfg <span id="olddate">17 Feb 2020</span><br><span class="note" style="margin:0">Wrong? Tap "Type it" above to correct it.</span></div></div>
+      </div>
     </div>
-    <div class="row" style="margin-top:10px">
-      <div><label>Or type serial</label><input type="text" id="o-serial" placeholder="N2002172977"></div>
-      <div><label>Mfg date</label><input type="text" id="o-date" placeholder="17Feb20"></div>
+    <div id="o-typezone" style="display:none;margin-top:8px">
+      <label style="font-weight:800">Type Serial Number</label>
+      <input type="text" id="o-serial" placeholder="e.g. N2002172977">
+      <label style="font-weight:800">Manufacture Date</label>
+      <input type="text" id="o-date" placeholder="Type MMYY Only" inputmode="numeric">
     </div>
     <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery, Next Battery</button>
     <button class="btn ghost small" style="display:block;width:100%;margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
@@ -267,16 +273,18 @@ input:focus{outline:2px solid var(--blue)}
 <!-- 5: string test -->
 <section class="screen" id="s-string">
   <div class="prog"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i></div>
-  <h2>String test</h2>
+  <h2>String Test</h2>
   <p class="sub" id="stringsub">4-battery Job - String A only. String B isn't even shown.</p>
   <div class="card">
-    <div class="row">
-      <div><label>String A Voltage (V)</label><input type="number" step="0.1" placeholder="52.0" inputmode="decimal"></div>
-      <div><label>String A Current (A)</label><input type="number" step="0.1" placeholder="5.9" inputmode="decimal"></div>
-    </div>
-    <div class="row" id="stringB" style="display:none">
-      <div><label>String B Voltage (V)</label><input type="number" step="0.1" placeholder="52.0" inputmode="decimal"></div>
-      <div><label>String B Current (A)</label><input type="number" step="0.1" placeholder="5.9" inputmode="decimal"></div>
+    <label style="margin-top:0;font-weight:800">String A Voltage (V)</label>
+    <input type="number" step="0.1" placeholder="52.0" inputmode="decimal">
+    <label style="font-weight:800">String A Current (A)</label>
+    <input type="number" step="0.1" placeholder="5.9" inputmode="decimal">
+    <div id="stringB" style="display:none">
+      <label style="font-weight:800">String B Voltage (V)</label>
+      <input type="number" step="0.1" placeholder="52.0" inputmode="decimal">
+      <label style="font-weight:800">String B Current (A)</label>
+      <input type="number" step="0.1" placeholder="5.9" inputmode="decimal">
     </div>
   </div>
   <div class="footer"><button class="btn ghost" onclick="go('s-old')">Back</button><button class="btn primary" onclick="buildSummary()">Review →</button></div>
@@ -327,7 +335,7 @@ function updateMismatch(){const mm=document.getElementById('mismatch');if(st.job
 function setOtherQty(v){st.qty=Math.min(12,Math.max(0,parseInt(v)||0));updateMismatch();}
 function labels(){const n=st.qty>0?Math.min(st.qty,12):4;const L=[];for(let i=0;i<n;i++)L.push((['A','B','C'][Math.floor(i/4)])+((i%4)+1));return L;}
 function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;st.newData={};st.oldData={};renderTabs('newtabs',st.newIdx,st.newDone);renderTabs('oldtabs',st.oldIdx,st.oldDone);loadNew(0);loadOld(0);
- const multi=st.qty>4;document.getElementById('stringB').style.display=multi?'flex':'none';
+ const multi=st.qty>4;document.getElementById('stringB').style.display=multi?'block':'none';
  document.getElementById('stringsub').textContent=multi?st.qty+"-battery Job - String A and String B readings.":st.qty+"-battery Job - String A only. String B isn't even shown.";
  go('s-new');}
 function renderTabs(id,cur,done){const el=document.getElementById(id);el.innerHTML='';const L=labels();
@@ -369,9 +377,8 @@ function captureNew(){
   comment:document.getElementById('n-comment').value};}
 function stashNew(){const d=captureNew();if(d.ocv||d.dom||d.serial||d.comment||d.domScan||d.serScan||st.newData[st.newIdx])st.newData[st.newIdx]=d;}
 function stashOld(){if(document.getElementById('o-nabar').style.display==='block')return;
- const scan=document.getElementById('o-scan').style.display==='block';
- const d=scan?{scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent}:{serial:document.getElementById('o-serial').value,date:document.getElementById('o-date').value};
- if(d.serial||d.date||st.oldData[st.oldIdx])st.oldData[st.oldIdx]=d;}
+ const d=captureOld();
+ if(d.scan||d.serial||d.date||st.oldData[st.oldIdx])st.oldData[st.oldIdx]=d;}
 function loadNew(i){const d=st.newData[i];
  document.getElementById('n-serresult').style.display='none';document.getElementById('n-domscan').style.display='none';
  ['n-ocv','n-dom','n-serial','n-comment'].forEach(id=>document.getElementById(id).value='');
@@ -392,21 +399,26 @@ function saveBattery(){st.newData[st.newIdx]=captureNew();
  if(next<0){renderTabs('newtabs',st.newIdx,st.newDone);go('s-old');}
  else{st.newIdx=next;renderTabs('newtabs',st.newIdx,st.newDone);loadNew(st.newIdx);}}
 const demoOld=[["N2002172977","17 Feb 2020"],["N2002172981","17 Feb 2020"],["N2001988014","3 Dec 2019"],["N2002171205","12 Feb 2020"],["N2001990227","5 Dec 2019"],["N2002168830","10 Feb 2020"],["N2001987336","2 Dec 2019"],["N2002170518","11 Feb 2020"]];
+function oldMode(m,f){document.getElementById('oldseg1').classList.toggle('sel',m===1);document.getElementById('oldseg2').classList.toggle('sel',m===2);document.getElementById('o-camzone').style.display=m===1?'block':'none';document.getElementById('o-typezone').style.display=m===2?'block':'none';
+ if(m===2&&document.getElementById('o-scan').style.display==='block'){document.getElementById('o-serial').value=document.getElementById('oldval').textContent;document.getElementById('o-date').value=document.getElementById('olddate').textContent;}
+ if(m===2&&f)document.getElementById('o-serial').focus();}
 function scanOld(){const p=demoOld[st.oldIdx%demoOld.length];
  document.getElementById('oldline').textContent='▮▮ ▮ ▮▮▮ '+p[0]+' ▮ ▮▮ ▮▮';
  document.getElementById('oldval').textContent=p[0];document.getElementById('olddate').textContent=p[1];
  document.getElementById('o-scan').style.display='block';}
-function saveOldBattery(){
- if(document.getElementById('o-scan').style.display==='block'){st.oldData[st.oldIdx]={scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent};}
- else{st.oldData[st.oldIdx]={serial:document.getElementById('o-serial').value,date:document.getElementById('o-date').value};}
- markOld();}
+function captureOld(){const cam=document.getElementById('oldseg1').classList.contains('sel');
+ const scanned=cam&&document.getElementById('o-scan').style.display==='block';
+ if(scanned)return {scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent};
+ return {serial:cam?'':document.getElementById('o-serial').value,date:cam?'':document.getElementById('o-date').value};}
+function saveOldBattery(){st.oldData[st.oldIdx]=captureOld();markOld();}
 function oldNA(){st.oldData[st.oldIdx]={na:true};markOld();}
 function loadOld(i){const d=st.oldData[i];
  document.getElementById('o-scan').style.display='none';document.getElementById('o-nabar').style.display='none';
  document.getElementById('o-serial').value='';document.getElementById('o-date').value='';
+ oldMode(1);
  if(d){if(d.na){document.getElementById('o-nabar').style.display='block';}
   else if(d.scan){document.getElementById('oldline').textContent='▮▮ ▮ ▮▮▮ '+d.serial+' ▮ ▮▮ ▮▮';document.getElementById('oldval').textContent=d.serial;document.getElementById('olddate').textContent=d.date;document.getElementById('o-scan').style.display='block';}
-  else{document.getElementById('o-serial').value=d.serial||'';document.getElementById('o-date').value=d.date||'';}}
+  else if(d.serial||d.date){oldMode(2);document.getElementById('o-serial').value=d.serial||'';document.getElementById('o-date').value=d.date||'';}}
  updateOldBar();}
 function updateOldBar(){const done=st.oldDone.includes(st.oldIdx);const L=labels()[st.oldIdx];
  const bar=document.getElementById('oldreview');const btn=document.getElementById('saveoldbtn');
