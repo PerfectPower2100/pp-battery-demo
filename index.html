@@ -87,6 +87,7 @@ input:focus{outline:2px solid var(--blue)}
 .summary-batt{font-family:ui-monospace,monospace;font-size:12.5px;background:#f7f9fa;border-radius:8px;padding:8px;margin-top:6px}
 .warn{background:#fff8dc;border:1.5px solid var(--yellow);border-radius:10px;padding:10px;font-size:12.5px;margin-top:8px}
 .mismatch{background:#fdf0ef;border:1.5px solid var(--red);border-radius:10px;padding:10px;font-size:12.5px;margin-top:8px;display:none}
+.reviewbar{background:#e6f5fc;border:1.5px solid var(--blue);border-radius:10px;padding:10px;font-size:12.5px;margin-bottom:8px;display:none}
 .demo-tag{position:fixed;top:64px;right:8px;background:var(--yellow);color:#333;font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px;z-index:11;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .today-row{display:flex;gap:8px}
 .today-row input{flex:1}
@@ -109,6 +110,7 @@ input:focus{outline:2px solid var(--blue)}
 </header>
 <div class="demo-tag">DEMO - dummy data</div>
 
+<!-- 0: name pick -->
 <section class="screen on" id="s-name">
   <h2>G'day. Who are you?</h2>
   <p class="sub">One-time ask, and I'll know who you are from now on</p>
@@ -133,6 +135,7 @@ input:focus{outline:2px solid var(--blue)}
   <p class="note">No signal, no problem. I'll sync with the cloud when you next have signal. Nothing will be lost.</p>
 </section>
 
+<!-- 1: nearby jobs -->
 <section class="screen" id="s-jobs">
   <h2>Battery Jobs near you</h2>
   <div class="gps"><span class="dot"></span><span id="gpstext">Using your location - sites within 800 m</span><button class="refresh" id="refreshbtn" onclick="refreshJobs()">↻ Refresh</button></div>
@@ -164,6 +167,7 @@ input:focus{outline:2px solid var(--blue)}
   </div>
 </section>
 
+<!-- 2: confirm job -->
 <section class="screen" id="s-confirm">
   <h2>Confirm Job details</h2>
   <div class="card">
@@ -195,16 +199,18 @@ input:focus{outline:2px solid var(--blue)}
   <div class="footer"><button class="btn ghost" onclick="go('s-jobs')">Back</button><button class="btn primary" onclick="startCapture()">Start</button></div>
 </section>
 
+<!-- 3: new batteries -->
 <section class="screen" id="s-new">
   <div class="prog"><i class="done"></i><i class="now"></i><i></i><i></i></div>
   <h2>New batteries in</h2>
   <p class="sub">Tap a battery. Scan what you can, type if the scan doesn't register</p>
   <div class="batt-tabs" id="newtabs"></div>
   <div class="card">
+    <div class="reviewbar" id="newreview"></div>
     <label style="margin-top:0">OCV - Pre installation (V)</label>
     <input type="number" step="0.1" id="n-ocv" placeholder="V" inputmode="decimal">
     <label style="font-weight:800">Manufacture Date - scan the batch sticker with your camera, or type it in below</label>
-    <div class="seg"><button id="domseg1" class="sel" onclick="domMode(1)">📷 Camera read</button><button id="domseg2" onclick="domMode(2)">⌨️ Type it</button></div>
+    <div class="seg"><button id="domseg1" class="sel" onclick="domMode(1)">📷 Camera read</button><button id="domseg2" onclick="domMode(2,1)">⌨️ Type it</button></div>
     <div id="n-domzone" style="margin-top:8px">
       <button class="btn yellow small" style="display:block;width:100%" onclick="scanDom()">📷 Scan batch sticker</button>
       <div id="n-domscan" style="display:none">
@@ -216,7 +222,7 @@ input:focus{outline:2px solid var(--blue)}
       <input type="text" id="n-dom" placeholder="Type MMYY only" inputmode="numeric">
     </div>
     <label style="font-weight:800">Serial Number - etched on the case</label>
-    <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2)">⌨️ Type it</button></div>
+    <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2,1)">⌨️ Type it</button></div>
     <div id="n-serscan" style="margin-top:8px">
       <button class="btn yellow small" style="display:block;width:100%" onclick="scanSerial()">📷 Read serial</button>
       <div id="n-serresult" style="display:none">
@@ -227,7 +233,7 @@ input:focus{outline:2px solid var(--blue)}
     <div id="n-sertype" style="display:none;margin-top:8px">
       <input type="text" id="n-serial" placeholder="Type Serial Number (10 digits)" inputmode="numeric" maxlength="10">
     </div>
-    <button class="btn green" onclick="saveBattery()">Save this Battery, Next Battery →</button>
+    <button class="btn green" id="savenewbtn" onclick="saveBattery()">Save this Battery, Next Battery →</button>
     <label>Comment - Optional</label>
     <input type="text" id="n-comment" placeholder="e.g. replacement looks used">
     <p class="note">📸 A photo is kept automatically either way - if anything's ever queried, the evidence already exists.</p>
@@ -235,26 +241,31 @@ input:focus{outline:2px solid var(--blue)}
   <div class="footer"><button class="btn ghost" onclick="go('s-confirm')">Back</button><button class="btn primary" onclick="go('s-old')">Old batteries →</button></div>
 </section>
 
+<!-- 4: old batteries -->
 <section class="screen" id="s-old">
   <div class="prog"><i class="done"></i><i class="done"></i><i class="now"></i><i></i></div>
   <h2>Old batteries out</h2>
   <p class="sub">Point the camera at the barcode - serial AND date land together.</p>
   <div class="batt-tabs" id="oldtabs"></div>
   <div class="card">
+    <div class="reviewbar" id="oldreview"></div>
+    <div class="warn" id="o-nabar" style="display:none">🚫 This one was marked NA - no sticker.</div>
     <button class="btn yellow small" style="display:block;width:100%" onclick="scanOld()">📷 Scan barcode</button>
     <div id="o-scan" style="display:none">
-      <div class="scanline">▮▮ ▮ ▮▮▮ N2002172977 ▮ ▮▮ ▮▮</div>
-      <div class="confirmbar">✅ <div><b>N2002172977</b> - Mfg 17 Feb 2020<br><span class="note" style="margin:0">Both fields filled from one scan.</span><br><button class="btn small green" style="display:block;width:100%;margin-top:6px" onclick="acceptOld()">Next battery</button></div></div>
+      <div class="scanline" id="oldline">▮▮ ▮ ▮▮▮ N2002172977 ▮ ▮▮ ▮▮</div>
+      <div class="confirmbar">✅ <div><b id="oldval">N2002172977</b> - Mfg <span id="olddate">17 Feb 2020</span><br><span class="note" style="margin:0">Both fields filled from one scan.</span></div></div>
     </div>
     <div class="row" style="margin-top:10px">
       <div><label>Or type serial</label><input type="text" id="o-serial" placeholder="N2002172977"></div>
       <div><label>Mfg date</label><input type="text" id="o-date" placeholder="17Feb20"></div>
     </div>
+    <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery, Next Battery →</button>
     <button class="btn ghost small" style="display:block;width:100%;margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
   </div>
   <div class="footer"><button class="btn ghost" onclick="go('s-new')">Back</button><button class="btn primary" onclick="go('s-string')">String test →</button></div>
 </section>
 
+<!-- 5: string test -->
 <section class="screen" id="s-string">
   <div class="prog"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i></div>
   <h2>String test</h2>
@@ -272,6 +283,7 @@ input:focus{outline:2px solid var(--blue)}
   <div class="footer"><button class="btn ghost" onclick="go('s-old')">Back</button><button class="btn primary" onclick="buildSummary()">Review →</button></div>
 </section>
 
+<!-- 6: review + submit -->
 <section class="screen" id="s-review">
   <h2>Done. Check and send.</h2>
   <p class="sub">This becomes the official spreadsheet - named, filed and emailed for you.</p>
@@ -280,6 +292,7 @@ input:focus{outline:2px solid var(--blue)}
   <div class="footer"><button class="btn ghost" onclick="go('s-string')">Back</button><button class="btn green" onclick="submitJob()">Submit Job ✓</button></div>
 </section>
 
+<!-- 7: success -->
 <section class="screen" id="s-done">
   <div class="big-ok">🎉</div>
   <h2 class="center">Job submitted</h2>
@@ -300,7 +313,7 @@ const jobs=[
  {wor:"WOR201311802073",inc:"INC000091234567",addr:"Cnr Pittwater Rd & Winbourne Rd, Brookvale",size:"62A",qty:4},
  {wor:"WOR201332293438",inc:"INC000091198822",addr:"88 Fisher Rd, Dee Why",size:"7A",qty:8},
  {wor:"WOR201303348444",inc:"INC000090877310",addr:"12 Ocean St, Narraweena",size:"100A",qty:4}];
-let st={tech:"",job:null,qty:0,newIdx:0,oldIdx:0,newDone:[],oldDone:[]};
+let st={tech:"",job:null,qty:0,newIdx:0,oldIdx:0,newDone:[],oldDone:[],newData:{},oldData:{}};
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
 function pickName(n){st.tech=n;go('s-jobs');}
 function pickJob(i){st.job=jobs[i];fillConfirm();go('s-confirm');}
@@ -314,12 +327,12 @@ function setQty(q){['q4','q8','qo'].forEach(id=>document.getElementById(id).clas
 function updateMismatch(){const mm=document.getElementById('mismatch');if(st.job&&st.qty!==st.job.qty){mm.style.display='block';document.getElementById('mm-novus').textContent=st.job.qty+" Batteries";}else mm.style.display='none';}
 function setOtherQty(v){st.qty=Math.min(12,Math.max(0,parseInt(v)||0));updateMismatch();}
 function labels(){const n=st.qty>0?Math.min(st.qty,12):4;const L=[];for(let i=0;i<n;i++)L.push((['A','B','C'][Math.floor(i/4)])+((i%4)+1));return L;}
-function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;renderTabs('newtabs',st.newIdx,st.newDone);renderTabs('oldtabs',st.oldIdx,st.oldDone);
+function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;st.newData={};st.oldData={};renderTabs('newtabs',st.newIdx,st.newDone);renderTabs('oldtabs',st.oldIdx,st.oldDone);loadNew(0);loadOld(0);
  const multi=st.qty>4;document.getElementById('stringB').style.display=multi?'flex':'none';
  document.getElementById('stringsub').textContent=multi?st.qty+"-battery Job - String A and String B readings.":st.qty+"-battery Job - String A only. String B isn't even shown.";
  go('s-new');}
 function renderTabs(id,cur,done){const el=document.getElementById(id);el.innerHTML='';const L=labels();
- const mk=(items,offset)=>{const row=document.createElement('div');row.className='batt-row';items.forEach((l,j)=>{const i=offset+j;const b=document.createElement('button');b.textContent=(done.includes(i)?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.includes(i))b.classList.add('ok');b.onclick=()=>{if(id==='newtabs'){st.newIdx=i;renderTabs(id,i,done);}else{st.oldIdx=i;renderTabs(id,i,done);}};row.appendChild(b);});el.appendChild(row);};
+ const mk=(items,offset)=>{const row=document.createElement('div');row.className='batt-row';items.forEach((l,j)=>{const i=offset+j;const b=document.createElement('button');b.textContent=(done.includes(i)?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.includes(i))b.classList.add('ok');b.onclick=()=>{if(id==='newtabs'){st.newIdx=i;renderTabs(id,i,done);loadNew(i);}else{st.oldIdx=i;renderTabs(id,i,done);loadOld(i);}};row.appendChild(b);});el.appendChild(row);};
  mk(L.slice(0,4),0);if(L.length>4)mk(L.slice(4),4);}
 function fmtDate(d){return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
 function setDate(k){['dt-today','dt-yest','dt-other'].forEach(function(id){document.getElementById(id).classList.remove('sel');});
@@ -342,28 +355,73 @@ function copyWor(e, wor, btn){e.stopPropagation();
  else{fallbackCopy(wor);done();}}
 function fallbackCopy(text){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(err){}document.body.removeChild(ta);}
 function scanDom(){document.getElementById('n-domscan').style.display='block';}
-function domMode(m){document.getElementById('domseg1').classList.toggle('sel',m===1);document.getElementById('domseg2').classList.toggle('sel',m===2);document.getElementById('n-domzone').style.display=m===1?'block':'none';document.getElementById('n-domtype').style.display=m===2?'block':'none';}
-function serMode(m){document.getElementById('serseg1').classList.toggle('sel',m===1);document.getElementById('serseg2').classList.toggle('sel',m===2);document.getElementById('n-serscan').style.display=m===1?'block':'none';document.getElementById('n-sertype').style.display=m===2?'block':'none';if(m===2&&document.getElementById('n-serresult').style.display==='block'){document.getElementById('n-serial').value=document.getElementById('serval').textContent;}}
+function domMode(m,f){document.getElementById('domseg1').classList.toggle('sel',m===1);document.getElementById('domseg2').classList.toggle('sel',m===2);document.getElementById('n-domzone').style.display=m===1?'block':'none';document.getElementById('n-domtype').style.display=m===2?'block':'none';if(m===2&&f)document.getElementById('n-dom').focus();}
+function serMode(m,f){document.getElementById('serseg1').classList.toggle('sel',m===1);document.getElementById('serseg2').classList.toggle('sel',m===2);document.getElementById('n-serscan').style.display=m===1?'block':'none';document.getElementById('n-sertype').style.display=m===2?'block':'none';if(m===2&&document.getElementById('n-serresult').style.display==='block'){document.getElementById('n-serial').value=document.getElementById('serval').textContent;}if(m===2&&f)document.getElementById('n-serial').focus();}
 const demoSerials=["0013301624","0013301627","0013310784","0013310808","0013261270","0013280939","0012973151","0012973142"];
 function scanSerial(){const s=demoSerials[st.newIdx%demoSerials.length];document.getElementById('serline').textContent=s;document.getElementById('serval').textContent=s;document.getElementById('n-serresult').style.display='block';}
-function saveBattery(){if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
- if(st.newDone.length>=labels().length){renderTabs('newtabs',st.newIdx,st.newDone);go('s-old');}
- else{st.newIdx=labels().findIndex((_,i)=>!st.newDone.includes(i));renderTabs('newtabs',st.newIdx,st.newDone);
+function captureNew(){
+ const domScanSel=document.getElementById('domseg1').classList.contains('sel');
+ const serScanSel=document.getElementById('serseg1').classList.contains('sel');
+ const domScanned=domScanSel&&document.getElementById('n-domscan').style.display==='block';
+ const serScanned=serScanSel&&document.getElementById('n-serresult').style.display==='block';
+ return {ocv:document.getElementById('n-ocv').value,
+  domScan:domScanned, dom:domScanned?'1125':(domScanSel?'':document.getElementById('n-dom').value),
+  serScan:serScanned, serial:serScanned?document.getElementById('serval').textContent:(serScanSel?'':document.getElementById('n-serial').value),
+  comment:document.getElementById('n-comment').value};}
+function loadNew(i){const d=st.newData[i];
  document.getElementById('n-serresult').style.display='none';document.getElementById('n-domscan').style.display='none';
- document.getElementById('n-ocv').value='';document.getElementById('n-dom').value='';document.getElementById('n-serial').value='';document.getElementById('n-comment').value='';
- domMode(1);serMode(1);}}
-function scanOld(){document.getElementById('o-scan').style.display='block';}
-function acceptOld(){markOld();}
-function oldNA(){markOld();}
+ ['n-ocv','n-dom','n-serial','n-comment'].forEach(id=>document.getElementById(id).value='');
+ domMode(1);serMode(1);
+ if(d){document.getElementById('n-ocv').value=d.ocv||'';document.getElementById('n-comment').value=d.comment||'';
+  if(d.domScan){document.getElementById('n-domscan').style.display='block';}
+  else if(d.dom){domMode(2);document.getElementById('n-dom').value=d.dom;}
+  if(d.serScan){document.getElementById('serline').textContent=d.serial;document.getElementById('serval').textContent=d.serial;document.getElementById('n-serresult').style.display='block';}
+  else if(d.serial){serMode(2);document.getElementById('n-serial').value=d.serial;}}
+ updateNewBar();}
+function updateNewBar(){const done=st.newDone.includes(st.newIdx);const L=labels()[st.newIdx];
+ const bar=document.getElementById('newreview');const btn=document.getElementById('savenewbtn');
+ if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
+ else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery →';}}
+function saveBattery(){st.newData[st.newIdx]=captureNew();
+ if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
+ const next=labels().findIndex((_,i)=>!st.newDone.includes(i));
+ if(next<0){renderTabs('newtabs',st.newIdx,st.newDone);go('s-old');}
+ else{st.newIdx=next;renderTabs('newtabs',st.newIdx,st.newDone);loadNew(st.newIdx);}}
+const demoOld=[["N2002172977","17 Feb 2020"],["N2002172981","17 Feb 2020"],["N2001988014","3 Dec 2019"],["N2002171205","12 Feb 2020"],["N2001990227","5 Dec 2019"],["N2002168830","10 Feb 2020"],["N2001987336","2 Dec 2019"],["N2002170518","11 Feb 2020"]];
+function scanOld(){const p=demoOld[st.oldIdx%demoOld.length];
+ document.getElementById('oldline').textContent='▮▮ ▮ ▮▮▮ '+p[0]+' ▮ ▮▮ ▮▮';
+ document.getElementById('oldval').textContent=p[0];document.getElementById('olddate').textContent=p[1];
+ document.getElementById('o-scan').style.display='block';}
+function saveOldBattery(){
+ if(document.getElementById('o-scan').style.display==='block'){st.oldData[st.oldIdx]={scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent};}
+ else{st.oldData[st.oldIdx]={serial:document.getElementById('o-serial').value,date:document.getElementById('o-date').value};}
+ markOld();}
+function oldNA(){st.oldData[st.oldIdx]={na:true};markOld();}
+function loadOld(i){const d=st.oldData[i];
+ document.getElementById('o-scan').style.display='none';document.getElementById('o-nabar').style.display='none';
+ document.getElementById('o-serial').value='';document.getElementById('o-date').value='';
+ if(d){if(d.na){document.getElementById('o-nabar').style.display='block';}
+  else if(d.scan){document.getElementById('oldline').textContent='▮▮ ▮ ▮▮▮ '+d.serial+' ▮ ▮▮ ▮▮';document.getElementById('oldval').textContent=d.serial;document.getElementById('olddate').textContent=d.date;document.getElementById('o-scan').style.display='block';}
+  else{document.getElementById('o-serial').value=d.serial||'';document.getElementById('o-date').value=d.date||'';}}
+ updateOldBar();}
+function updateOldBar(){const done=st.oldDone.includes(st.oldIdx);const L=labels()[st.oldIdx];
+ const bar=document.getElementById('oldreview');const btn=document.getElementById('saveoldbtn');
+ if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
+ else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery →';}}
 function markOld(){if(!st.oldDone.includes(st.oldIdx))st.oldDone.push(st.oldIdx);
- if(st.oldDone.length>=labels().length){renderTabs('oldtabs',st.oldIdx,st.oldDone);go('s-string');}
- else{st.oldIdx=labels().findIndex((_,i)=>!st.oldDone.includes(i));renderTabs('oldtabs',st.oldIdx,st.oldDone);document.getElementById('o-scan').style.display='none';}}
+ const next=labels().findIndex((_,i)=>!st.oldDone.includes(i));
+ if(next<0){renderTabs('oldtabs',st.oldIdx,st.oldDone);go('s-string');}
+ else{st.oldIdx=next;renderTabs('oldtabs',st.oldIdx,st.oldDone);loadOld(st.oldIdx);}}
 function buildSummary(){const c=st.job;const f=c.size+"H Battery "+c.wor+".xlsx";
  let h='<div class="kv"><span>WOR</span><b>'+c.wor+'</b></div><div class="kv"><span>INC</span><b>'+c.inc+'</b></div><div class="kv"><span>Batteries</span><b>'+st.qty+' replaced</b></div><div class="kv"><span>File</span><b>'+f+'</b></div>';
- h+='<div class="summary-batt">A1 ✓ 13.1V - 1125 - 0013301624<br>A2 ✓ 13.0V - 1125 - 0013301627<br>A3 ✓ 13.1V - 1125 - 0013310784<br>A4 ✓ 13.2V - 1125 - 0013310808'+(st.qty>4?'<br>'+labels().slice(4).join(', ')+' ✓ captured':'')+'</div>';
+ const rows=labels().map(function(l,i){const d=st.newData[i];
+  if(d&&(d.ocv||d.serial||d.dom))return l+' ✓ '+(d.ocv?d.ocv+'V':'-')+' - '+(d.dom||'-')+' - '+(d.serial||'-')+(d.comment?'<br>&nbsp;&nbsp;💬 '+d.comment:'');
+  return l+' ✓ captured';}).join('<br>');
+ h+='<div class="summary-batt">'+rows+'</div>';
  if(st.qty!==c.qty)h+='<div class="mismatch" style="display:block">Auto-comment added: "Novus stated '+c.qty+' batteries - '+st.qty+' found and replaced onsite."</div>';
  document.getElementById('sumcard').innerHTML=h;go('s-review');}
 function submitJob(){document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor+".xlsx";document.getElementById('d-tech').textContent=st.tech||"Medium";go('s-done');}
+// fake offline toggle every so often to show the badge
 setInterval(()=>{const b=document.getElementById('netbadge');const off=b.classList.toggle('off');b.textContent=off?'OFFLINE - saving locally':'ONLINE';},9000);
 document.getElementById('logo').src=PP_LOGO;
 </script>
