@@ -169,7 +169,7 @@ input:focus{outline:2px solid var(--blue)}
     <div class="kv"><span>INC</span><b id="c-inc"></b></div>
     <div class="kv"><span>Site</span><b id="c-addr"></b></div>
     <div class="kv"><span>Battery size</span><b id="c-size"></b></div>
-    <div class="kv" style="border:0"><span>Install date</span><b id="c-date">Today ✓</b></div>
+    <div class="kv" style="border:0"><span>Install date</span><b id="c-date"></b></div>
     <div class="datechips">
       <button id="dt-today" class="sel" onclick="setDate('today')">Today</button>
       <button id="dt-yest" onclick="setDate('yest')">Yesterday</button>
@@ -186,7 +186,7 @@ input:focus{outline:2px solid var(--blue)}
     </div>
     <div id="otherqty" style="display:none;margin-top:10px">
       <label style="margin-top:0">How many batteries?</label>
-      <input type="number" id="qty-n" min="1" max="12" inputmode="numeric" placeholder="e.g. 6" oninput="setOtherQty(this.value)">
+      <input type="number" id="qty-n" min="1" max="12" inputmode="numeric" placeholder="Enter the number of Batteries" oninput="setOtherQty(this.value)">
     </div>
     <div class="mismatch" id="mismatch">The Ticket had <b id="mm-novus"></b>. Click Start to begin.</div>
   </div>
@@ -301,7 +301,7 @@ function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remo
 function pickName(n){st.tech=n;go('s-jobs');}
 function pickJob(i){st.job=jobs[i];fillConfirm();go('s-confirm');}
 function manualJob(){const v=document.getElementById('manualwor').value.trim();st.job={wor:"WOR"+(v||"201399999999"),inc:"INC000099999999",addr:"(from Novus once synced)",size:"62A",qty:4};fillConfirm();go('s-confirm');}
-function fillConfirm(){c=st.job;document.getElementById('c-wor').textContent=c.wor;document.getElementById('c-inc').textContent=c.inc;document.getElementById('c-addr').textContent=c.addr;document.getElementById('c-size').textContent=c.size+" ("+c.qty+" batteries per Novus)";setQty(c.qty);}
+function fillConfirm(){c=st.job;document.getElementById('c-wor').textContent=c.wor;document.getElementById('c-inc').textContent=c.inc;document.getElementById('c-addr').textContent=c.addr;document.getElementById('c-size').textContent=c.size+" ("+c.qty+" batteries per Novus)";setQty(c.qty);setDate('today');}
 function setQty(q){['q4','q8','qo'].forEach(id=>document.getElementById(id).classList.remove('sel'));document.getElementById(q===4?'q4':q===8?'q8':'qo').classList.add('sel');
  const oq=document.getElementById('otherqty');
  if(q===0){oq.style.display='block';const inp=document.getElementById('qty-n');st.qty=parseInt(inp.value)||0;inp.focus();}
@@ -318,7 +318,7 @@ function renderTabs(id,cur,done){const el=document.getElementById(id);el.innerHT
 function fmtDate(d){return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
 function setDate(k){['dt-today','dt-yest','dt-other'].forEach(function(id){document.getElementById(id).classList.remove('sel');});
  var p=document.getElementById('dt-picker');var lab=document.getElementById('c-date');
- if(k==='today'){document.getElementById('dt-today').classList.add('sel');p.style.display='none';lab.textContent='Today ✓';}
+ if(k==='today'){document.getElementById('dt-today').classList.add('sel');p.style.display='none';lab.textContent=fmtDate(new Date());}
  else if(k==='yest'){document.getElementById('dt-yest').classList.add('sel');p.style.display='none';var y=new Date();y.setDate(y.getDate()-1);lab.textContent=fmtDate(y);}
  else{document.getElementById('dt-other').classList.add('sel');p.style.display='block';p.max=new Date().toISOString().slice(0,10);if(p.showPicker)try{p.showPicker();}catch(e){}}}
 function datePicked(v){if(!v)return;var d=new Date(v+'T12:00:00');document.getElementById('c-date').textContent=fmtDate(d);}
