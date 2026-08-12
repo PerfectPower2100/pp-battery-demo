@@ -214,7 +214,7 @@ input:focus{outline:2px solid var(--blue)}
     <label style="font-weight:800">Serial - etched on the case</label>
     <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2)">⌨️ Type it</button></div>
     <div id="n-serscan" style="margin-top:8px">
-      <button class="btn yellow small" onclick="scanSerial()">📷 Read serial</button>
+      <button class="btn yellow small" style="display:block;width:100%" onclick="scanSerial()">📷 Read serial</button>
       <div id="n-serresult" style="display:none">
         <div class="scanline" id="serline">0013301624</div>
         <div class="confirmbar">✅ <div>Read: <b id="serval">0013301624</b> - correct? <br><button class="btn small green" onclick="acceptSerial()">Yes, next battery</button> <button class="btn small ghost" onclick="serMode(2)">No, I'll type it</button></div></div>
