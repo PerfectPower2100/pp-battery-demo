@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Mock-up 3 - Site Mode</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#15181d;color:#e8eaee;max-width:480px;margin:0 auto;min-height:100vh}
+.tag{position:fixed;top:10px;right:10px;background:#ffd400;color:#15181d;font-size:11px;font-weight:900;padding:5px 10px;border-radius:4px;z-index:50}
+header{padding:16px 18px;border-bottom:4px solid #ffd400;display:flex;align-items:baseline;gap:10px}
+header .b{font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+header .s{font-size:12px;color:#ffd400;font-weight:800;letter-spacing:1px}
+.wrap{padding:18px;padding-bottom:120px}
+.stitle{font-size:13px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:#8b93a2;margin:4px 0 12px}
+.jobtile{border:3px solid #2c313b;border-radius:10px;padding:16px;margin-bottom:12px;cursor:pointer}
+.jobtile:active{border-color:#ffd400}
+.jobtile .wor{font-family:ui-monospace,monospace;font-size:17px;font-weight:800;color:#ffd400}
+.jobtile .addr{font-size:14px;color:#aeb6c2;margin-top:4px}
+.jobtile .row{display:flex;gap:10px;margin-top:10px;font-size:12px;font-weight:800}
+.jobtile .chip{border:2px solid #2c313b;border-radius:4px;padding:3px 8px;color:#e8eaee}
+.jobtile .chip.hot{border-color:#57d06c;color:#57d06c}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.batt{border:3px solid #2c313b;border-radius:12px;padding:18px 10px;text-align:center;cursor:pointer;position:relative}
+.batt .led{width:12px;height:12px;border-radius:50%;background:#3a404c;position:absolute;top:10px;right:10px}
+.batt.now{border-color:#ffd400}
+.batt.now .led{background:#ffd400;box-shadow:0 0 8px #ffd400}
+.batt.ok{border-color:#57d06c}
+.batt.ok .led{background:#57d06c;box-shadow:0 0 8px #57d06c}
+.batt .id{font-size:26px;font-weight:900;font-family:ui-monospace,monospace}
+.batt .st{font-size:11px;font-weight:800;letter-spacing:1px;color:#8b93a2;margin-top:4px;text-transform:uppercase}
+.batt.ok .st{color:#57d06c}
+.panel{border:3px solid #ffd400;border-radius:12px;padding:16px}
+.panel .pt{font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.fieldbtn{display:flex;align-items:center;gap:12px;width:100%;border:3px solid #2c313b;background:#1b1f26;border-radius:10px;padding:18px 14px;margin-bottom:10px;color:#e8eaee;font-size:16px;font-weight:800;cursor:pointer;text-align:left}
+.fieldbtn .ic{font-size:22px}
+.fieldbtn .val{margin-left:auto;font-family:ui-monospace,monospace;color:#8b93a2;font-size:14px}
+.fieldbtn.done{border-color:#57d06c}
+.fieldbtn.done .val{color:#57d06c}
+.numin{width:100%;border:3px solid #2c313b;background:#1b1f26;border-radius:10px;padding:18px;font-size:26px;font-weight:800;color:#ffd400;text-align:center;font-family:ui-monospace,monospace;display:none;margin-bottom:10px}
+.numin:focus{outline:none;border-color:#ffd400}
+.dock{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#15181d;border-top:3px solid #2c313b;padding:12px 18px 18px;z-index:40}
+.act{display:block;width:100%;border:0;border-radius:10px;padding:20px;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:#ffd400;color:#15181d}
+.act.green{background:#57d06c}
+.act.dim{background:#2c313b;color:#8b93a2}
+.stepper{display:flex;gap:6px;margin-bottom:14px}
+.stepper i{flex:1;height:8px;border-radius:2px;background:#2c313b}
+.stepper i.on{background:#ffd400}.stepper i.done{background:#57d06c}
+.bigmsg{text-align:center;padding:40px 20px}
+.bigmsg .e{font-size:70px}
+.bigmsg h2{font-size:24px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+.bigmsg p{color:#aeb6c2;font-size:15px;line-height:1.6}
+.mono{font-family:ui-monospace,monospace}
+</style>
+</head>
+<body>
+<div class="tag">MOCK-UP #3</div>
+<header><div class="b">PP // Site Mode</div><div class="s" id="hdr">NIGHT-READABLE</div></header>
+<div class="wrap" id="wrap"></div>
+<div class="dock" id="dock"></div>
+<script>
+const S={sec:'new',cur:0,newSt:{},oldSt:{}};
+const B=['A1','A2','A3','A4'];
+const SERS=['0013301624','0013301627','0013310784','0013310808'];
+const OLDS=['N2002172977','N2002172981','N2001988014','N2002171205'];
+const el=id=>document.getElementById(id);
+function stepper(n){let h='<div class="stepper">';for(let i=0;i<4;i++)h+='<i class="'+(i<n?'done':i===n?'on':'')+'"></i>';return h+'</div>';}
+function home(){
+ el('hdr').textContent='JOBS NEARBY';
+ el('wrap').innerHTML='<div class="stitle">Tap your job</div>'+
+ '<div class="jobtile" onclick="battScreen()"><div class="wor">WOR201311802073</div><div class="addr">Cnr Pittwater Rd &amp; Winbourne Rd, Brookvale</div><div class="row"><span class="chip hot">120 M</span><span class="chip">62A</span><span class="chip">4 BATT</span></div></div>'+
+ '<div class="jobtile"><div class="wor">WOR201332293438</div><div class="addr">88 Fisher Rd, Dee Why</div><div class="row"><span class="chip">450 M</span><span class="chip">7A</span><span class="chip">8 BATT</span></div></div>'+
+ '<div class="jobtile"><div class="wor">WOR201303348444</div><div class="addr">12 Ocean St, Narraweena</div><div class="row"><span class="chip">790 M</span><span class="chip">100A</span><span class="chip">4 BATT</span></div></div>';
+ el('dock').innerHTML='';
+}
+function battScreen(){
+ const isNew=S.sec==='new';
+ const st=isNew?S.newSt:S.oldSt;
+ el('hdr').textContent=isNew?'NEW BATTERIES IN':'OLD BATTERIES OUT';
+ let g='<div class="grid">';
+ B.forEach((b,i)=>{const k=st[i]?'ok':(i===S.cur?'now':'');
+  g+='<div class="batt '+k+'" onclick="S.cur='+i+';battScreen()"><span class="led"></span><div class="id">'+b+'</div><div class="st">'+(st[i]?'Done':'Waiting')+'</div></div>';});
+ g+='</div>';
+ const d=st[S.cur]||{};
+ let p='<div class="panel"><div class="pt">Battery '+B[S.cur]+(st[S.cur]?' - saved, tap fields to fix':'')+'</div>';
+ if(isNew){
+  p+='<button class="fieldbtn'+(d.ocv?' done':'')+'" onclick="askOCV()"><span class="ic">⚡</span> OCV Volts <span class="val" id="v-ocv">'+(d.ocv||'TAP')+'</span></button>';
+  p+='<input class="numin" id="ocvin" type="number" inputmode="decimal" placeholder="13.1">';
+  p+='<button class="fieldbtn'+(d.dom?' done':'')+'" onclick="scanDom()"><span class="ic">📷</span> Batch Sticker <span class="val">'+(d.dom||'SCAN')+'</span></button>';
+  p+='<button class="fieldbtn'+(d.ser?' done':'')+'" onclick="scanSer()"><span class="ic">📷</span> Serial Number <span class="val">'+(d.ser||'SCAN')+'</span></button>';
+ }else{
+  p+='<button class="fieldbtn'+(d.ser?' done':'')+'" onclick="scanOldB()"><span class="ic">📷</span> Barcode - serial + date together <span class="val">'+(d.ser?'✔':'SCAN')+'</span></button>';
+  if(d.ser)p+='<div class="stitle mono" style="margin:6px 2px">'+d.ser+' · '+d.dom+'</div>';
+  p+='<button class="fieldbtn" onclick="naOld()"><span class="ic">🚫</span> No sticker - mark NA</button>';
+ }
+ p+='</div>';
+ el('wrap').innerHTML='<div class="stitle">'+(isNew?'Section 2 of 4':'Section 3 of 4')+' · WOR...802073</div>'+stepper(isNew?1:2)+g+p;
+ const ready=isNew?(d.ocv&&d.dom&&d.ser):(d.ser||d.na);
+ el('dock').innerHTML='<button class="act'+(ready?' green':' dim')+'" onclick="saveBatt()">'+saveLabel(st)+'</button>';
+}
+function saveLabel(st){
+ const remaining=B.filter((_,i)=>!st[i]&&i!==S.cur).length;
+ if(remaining===0)return S.sec==='new'?'Save + Old Batteries':'Save + String Test';
+ return 'Save Battery '+B[S.cur];
+}
+function askOCV(){const i=el('ocvin');i.style.display='block';i.focus();
+ i.oninput=()=>{const st=S.newSt;st[S.cur]=st[S.cur]||{};st[S.cur].ocv=i.value;el('v-ocv').textContent=i.value||'TAP';};}
+function scanDom(){const st=S.newSt;st[S.cur]=st[S.cur]||{};st[S.cur].dom='1125';battScreen();}
+function scanSer(){const st=S.newSt;st[S.cur]=st[S.cur]||{};st[S.cur].ser=SERS[S.cur];battScreen();}
+function scanOldB(){const st=S.oldSt;st[S.cur]=st[S.cur]||{};st[S.cur].ser=OLDS[S.cur];st[S.cur].dom='0220';battScreen();}
+function naOld(){const st=S.oldSt;st[S.cur]={na:true,ser:'NA',dom:'NA'};battScreen();}
+function saveBatt(){
+ const st=S.sec==='new'?S.newSt:S.oldSt;
+ if(!st[S.cur])return;
+ st[S.cur].saved=true;
+ const nxt=B.findIndex((_,i)=>!st[i]);
+ if(nxt>=0){S.cur=nxt;battScreen();}
+ else if(S.sec==='new'){S.sec='old';S.cur=0;battScreen();}
+ else stringTest();
+}
+function stringTest(){
+ el('hdr').textContent='STRING TEST';
+ el('wrap').innerHTML='<div class="stitle">Section 4 of 4</div>'+stepper(3)+
+ '<div class="panel"><div class="pt">String A - off the meter</div>'+
+ '<div class="stitle">Voltage (V)</div><input class="numin" style="display:block" type="number" inputmode="decimal" placeholder="52.0">'+
+ '<div class="stitle">Current (A)</div><input class="numin" style="display:block" type="number" inputmode="decimal" placeholder="5.9"></div>';
+ el('dock').innerHTML='<button class="act green" onclick="doneScreen()">Lock it in + Send</button>';
+}
+function doneScreen(){
+ el('hdr').textContent='COMPLETE';
+ el('wrap').innerHTML='<div class="bigmsg"><div class="e">✅</div><h2>Job Sent</h2>'+
+ '<p class="mono">62AH Battery WOR201311802073.xlsx</p>'+
+ '<p>Filed to the nbn Drive · Emailed to nbn@ with photos attached · Zero paperwork left on the dash</p></div>';
+ el('dock').innerHTML='<button class="act" onclick="location.reload()">Restart Demo</button>';
+}
+home();
+</script>
+</body>
+</html>
