@@ -204,9 +204,8 @@ input:focus{outline:2px solid var(--blue)}
     <input type="number" step="0.1" id="n-ocv" placeholder="V" inputmode="decimal">
     <label>Manufacture date - scan the batch sticker</label>
     <div id="n-domzone">
-      <button class="btn yellow small" onclick="scanDom()">📷 Scan batch sticker</button>
-      <span class="note"> or </span>
-      <input type="text" id="n-dom" placeholder="MMYY e.g. 1125" inputmode="numeric" style="width:130px;display:inline-block">
+      <button class="btn yellow small" style="display:block;width:90%" onclick="scanDom()">📷 Scan batch sticker</button>
+      <input type="text" id="n-dom" placeholder="Type MMYY only" inputmode="numeric" style="width:90%;display:block;margin-top:6px">
     </div>
     <div id="n-domscan" style="display:none">
       <div class="scanline">Batch 1125 Last recharge 011125</div>
