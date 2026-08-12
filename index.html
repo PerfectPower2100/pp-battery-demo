@@ -75,6 +75,7 @@ input:focus{outline:2px solid var(--blue)}
 @keyframes scan{0%{top:8%}50%{top:88%}100%{top:8%}}
 .confirmbar{background:#eef8e3;border:1.5px solid var(--green);border-radius:12px;padding:11px;display:flex;align-items:center;gap:10px;margin-top:8px}
 .confirmbar b{font-family:ui-monospace,monospace;font-size:16px}
+.confirmbar>div{flex:1}
 .footer{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;z-index:9}
 .footer .btn{margin:0}
 .note{font-size:11.5px;color:#889;margin-top:8px;line-height:1.45}
@@ -211,18 +212,18 @@ input:focus{outline:2px solid var(--blue)}
       <div class="scanline">Batch 1125 Last recharge 011125</div>
       <div class="confirmbar">✅ <div>Batch <b>1125</b> → Nov 2025<br><span class="note" style="margin:0">Batch number on the sheet fills itself.</span></div></div>
     </div>
-    <label style="font-weight:800">Serial - etched on the case</label>
+    <label style="font-weight:800">Serial Number - etched on the case</label>
     <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2)">⌨️ Type it</button></div>
     <div id="n-serscan" style="margin-top:8px">
       <button class="btn yellow small" style="display:block;width:100%" onclick="scanSerial()">📷 Read serial</button>
       <div id="n-serresult" style="display:none">
         <div class="scanline" id="serline">0013301624</div>
-        <div class="confirmbar">✅ <div>Read: <b id="serval">0013301624</b> - correct? <br><button class="btn small green" onclick="acceptSerial()">Yes, next battery</button> <button class="btn small ghost" onclick="serMode(2)">No, I'll type it</button></div></div>
+        <div class="confirmbar">✅ <div>Read: <b id="serval">0013301624</b> - correct? <br><button class="btn small green" style="display:block;width:100%" onclick="acceptSerial()">Yes, next battery</button><button class="btn small ghost" style="display:block;width:100%;margin-top:8px" onclick="serMode(2)">No, I'll type it</button></div></div>
       </div>
     </div>
     <div id="n-sertype" style="display:none;margin-top:8px">
       <input type="text" id="n-serial" placeholder="10 digits, e.g. 0013301624" inputmode="numeric" maxlength="10">
-      <button class="btn green small" style="margin-top:8px" onclick="acceptSerial()">Save battery</button>
+      <button class="btn green small" style="display:block;width:100%;margin-top:8px" onclick="acceptSerial()">Save battery</button>
     </div>
     <label>Comment (optional - hardly ever needed)</label>
     <input type="text" id="n-comment" placeholder="e.g. replacement looks used">
@@ -237,16 +238,16 @@ input:focus{outline:2px solid var(--blue)}
   <p class="sub">Point the camera at the barcode - serial AND date land together.</p>
   <div class="batt-tabs" id="oldtabs"></div>
   <div class="card">
-    <button class="btn yellow small" onclick="scanOld()">📷 Scan barcode</button>
+    <button class="btn yellow small" style="display:block;width:100%" onclick="scanOld()">📷 Scan barcode</button>
     <div id="o-scan" style="display:none">
       <div class="scanline">▮▮ ▮ ▮▮▮ N2002172977 ▮ ▮▮ ▮▮</div>
-      <div class="confirmbar">✅ <div><b>N2002172977</b> - Mfg 17 Feb 2020<br><span class="note" style="margin:0">Both fields filled from one scan.</span><br><button class="btn small green" onclick="acceptOld()">Next battery</button></div></div>
+      <div class="confirmbar">✅ <div><b>N2002172977</b> - Mfg 17 Feb 2020<br><span class="note" style="margin:0">Both fields filled from one scan.</span><br><button class="btn small green" style="display:block;width:100%;margin-top:6px" onclick="acceptOld()">Next battery</button></div></div>
     </div>
     <div class="row" style="margin-top:10px">
       <div><label>Or type serial</label><input type="text" id="o-serial" placeholder="N2002172977"></div>
       <div><label>Mfg date</label><input type="text" id="o-date" placeholder="17Feb20"></div>
     </div>
-    <button class="btn ghost small" style="margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
+    <button class="btn ghost small" style="display:block;width:100%;margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
   </div>
   <div class="footer"><button class="btn ghost" onclick="go('s-new')">Back</button><button class="btn primary" onclick="go('s-string')">String test →</button></div>
 </section>
