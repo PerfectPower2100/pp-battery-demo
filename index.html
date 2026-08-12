@@ -236,7 +236,6 @@ input:focus{outline:2px solid var(--blue)}
     <button class="btn green" id="savenewbtn" onclick="saveBattery()">Save this Battery, Next Battery</button>
     <label>Comment - Optional</label>
     <input type="text" id="n-comment" placeholder="e.g. replacement looks used">
-    <p class="note">📸 A photo is kept automatically either way - if anything's ever queried, the evidence already exists.</p>
   </div>
   <div class="footer"><button class="btn ghost" onclick="go('s-confirm')">Back</button></div>
 </section>
@@ -332,7 +331,7 @@ function startCapture(){st.newDone=[];st.oldDone=[];st.newIdx=0;st.oldIdx=0;st.n
  document.getElementById('stringsub').textContent=multi?st.qty+"-battery Job - String A and String B readings.":st.qty+"-battery Job - String A only. String B isn't even shown.";
  go('s-new');}
 function renderTabs(id,cur,done){const el=document.getElementById(id);el.innerHTML='';const L=labels();
- const mk=(items,offset)=>{const row=document.createElement('div');row.className='batt-row';items.forEach((l,j)=>{const i=offset+j;const b=document.createElement('button');b.textContent=(done.includes(i)?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.includes(i))b.classList.add('ok');b.onclick=()=>{if(id==='newtabs'){st.newIdx=i;renderTabs(id,i,done);loadNew(i);}else{st.oldIdx=i;renderTabs(id,i,done);loadOld(i);}};row.appendChild(b);});el.appendChild(row);};
+ const mk=(items,offset)=>{const row=document.createElement('div');row.className='batt-row';items.forEach((l,j)=>{const i=offset+j;const b=document.createElement('button');b.textContent=(done.includes(i)?'✓ ':'')+l;if(i===cur)b.classList.add('sel');if(done.includes(i))b.classList.add('ok');b.onclick=()=>{if(id==='newtabs'){stashNew();st.newIdx=i;renderTabs(id,i,done);loadNew(i);}else{stashOld();st.oldIdx=i;renderTabs(id,i,done);loadOld(i);}};row.appendChild(b);});el.appendChild(row);};
  mk(L.slice(0,4),0);if(L.length>4)mk(L.slice(4),4);}
 function fmtDate(d){return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
 function setDate(k){['dt-today','dt-yest','dt-other'].forEach(function(id){document.getElementById(id).classList.remove('sel');});
@@ -368,6 +367,11 @@ function captureNew(){
   domScan:domScanned, dom:domScanned?'1125':(domScanSel?'':document.getElementById('n-dom').value),
   serScan:serScanned, serial:serScanned?document.getElementById('serval').textContent:(serScanSel?'':document.getElementById('n-serial').value),
   comment:document.getElementById('n-comment').value};}
+function stashNew(){const d=captureNew();if(d.ocv||d.dom||d.serial||d.comment||d.domScan||d.serScan||st.newData[st.newIdx])st.newData[st.newIdx]=d;}
+function stashOld(){if(document.getElementById('o-nabar').style.display==='block')return;
+ const scan=document.getElementById('o-scan').style.display==='block';
+ const d=scan?{scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent}:{serial:document.getElementById('o-serial').value,date:document.getElementById('o-date').value};
+ if(d.serial||d.date||st.oldData[st.oldIdx])st.oldData[st.oldIdx]=d;}
 function loadNew(i){const d=st.newData[i];
  document.getElementById('n-serresult').style.display='none';document.getElementById('n-domscan').style.display='none';
  ['n-ocv','n-dom','n-serial','n-comment'].forEach(id=>document.getElementById(id).value='');
