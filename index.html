@@ -391,8 +391,9 @@ function loadNew(i){const d=st.newData[i];
  updateNewBar();}
 function updateNewBar(){const done=st.newDone.includes(st.newIdx);const L=labels()[st.newIdx];
  const bar=document.getElementById('newreview');const btn=document.getElementById('savenewbtn');
+ const isLast=!done&&labels().every((_,i)=>i===st.newIdx||st.newDone.includes(i));
  if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
- else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery';}}
+ else{bar.style.display='none';btn.textContent=isLast?'Save this Battery, Move to Old Batteries':'Save this Battery, Next Battery';}}
 function saveBattery(){st.newData[st.newIdx]=captureNew();
  if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
  const next=labels().findIndex((_,i)=>!st.newDone.includes(i));
@@ -422,8 +423,9 @@ function loadOld(i){const d=st.oldData[i];
  updateOldBar();}
 function updateOldBar(){const done=st.oldDone.includes(st.oldIdx);const L=labels()[st.oldIdx];
  const bar=document.getElementById('oldreview');const btn=document.getElementById('saveoldbtn');
+ const isLast=!done&&labels().every((_,i)=>i===st.oldIdx||st.oldDone.includes(i));
  if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
- else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery';}}
+ else{bar.style.display='none';btn.textContent=isLast?'Save this Battery, Move to String Test':'Save this Battery, Next Battery';}}
 function markOld(){if(!st.oldDone.includes(st.oldIdx))st.oldDone.push(st.oldIdx);
  const next=labels().findIndex((_,i)=>!st.oldDone.includes(i));
  if(next<0){renderTabs('oldtabs',st.oldIdx,st.oldDone);go('s-string');}
