@@ -204,13 +204,16 @@ input:focus{outline:2px solid var(--blue)}
     <label style="margin-top:0">OCV - Pre installation (V)</label>
     <input type="number" step="0.1" id="n-ocv" placeholder="V" inputmode="decimal">
     <label style="font-weight:800">Manufacture Date - scan the batch sticker with your camera, or type it in below</label>
-    <div id="n-domzone">
+    <div class="seg"><button id="domseg1" class="sel" onclick="domMode(1)">📷 Camera read</button><button id="domseg2" onclick="domMode(2)">⌨️ Type it</button></div>
+    <div id="n-domzone" style="margin-top:8px">
       <button class="btn yellow small" style="display:block;width:100%" onclick="scanDom()">📷 Scan batch sticker</button>
-      <input type="text" id="n-dom" placeholder="Type MMYY only" inputmode="numeric" style="width:100%;display:block;margin-top:6px">
+      <div id="n-domscan" style="display:none">
+        <div class="scanline">Batch 1125 Last recharge 011125</div>
+        <div class="confirmbar">✅ <div>Batch <b>1125</b> → Nov 2025<br><span class="note" style="margin:0">Batch number on the sheet fills itself.</span></div></div>
+      </div>
     </div>
-    <div id="n-domscan" style="display:none">
-      <div class="scanline">Batch 1125 Last recharge 011125</div>
-      <div class="confirmbar">✅ <div>Batch <b>1125</b> → Nov 2025<br><span class="note" style="margin:0">Batch number on the sheet fills itself.</span></div></div>
+    <div id="n-domtype" style="display:none;margin-top:8px">
+      <input type="text" id="n-dom" placeholder="Type MMYY only" inputmode="numeric">
     </div>
     <label style="font-weight:800">Serial Number - etched on the case</label>
     <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2)">⌨️ Type it</button></div>
@@ -218,14 +221,14 @@ input:focus{outline:2px solid var(--blue)}
       <button class="btn yellow small" style="display:block;width:100%" onclick="scanSerial()">📷 Read serial</button>
       <div id="n-serresult" style="display:none">
         <div class="scanline" id="serline">0013301624</div>
-        <div class="confirmbar">✅ <div>Read: <b id="serval">0013301624</b> - correct? <br><button class="btn small green" style="display:block;width:100%" onclick="acceptSerial()">Save this Battery, Next Battery →</button><button class="btn small ghost" style="display:block;width:100%;margin-top:8px" onclick="serMode(2)">No, I'll type it</button></div></div>
+        <div class="confirmbar">✅ <div>Read: <b id="serval">0013301624</b> ✓<br><span class="note" style="margin:0">Wrong? Tap "Type it" above to correct it.</span></div></div>
       </div>
     </div>
     <div id="n-sertype" style="display:none;margin-top:8px">
-      <input type="text" id="n-serial" placeholder="10 digits, e.g. 0013301624" inputmode="numeric" maxlength="10">
-      <button class="btn green small" style="display:block;width:100%;margin-top:8px" onclick="acceptSerial()">Save battery</button>
+      <input type="text" id="n-serial" placeholder="Type Serial Number (10 digits)" inputmode="numeric" maxlength="10">
     </div>
-    <label>Comment (optional - hardly ever needed)</label>
+    <button class="btn green" onclick="saveBattery()">Save this Battery, Next Battery →</button>
+    <label>Comment - Optional</label>
     <input type="text" id="n-comment" placeholder="e.g. replacement looks used">
     <p class="note">📸 A photo is kept automatically either way - if anything's ever queried, the evidence already exists.</p>
   </div>
@@ -338,14 +341,17 @@ function copyWor(e, wor, btn){e.stopPropagation();
  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(wor).then(done).catch(function(){fallbackCopy(wor);done();});}
  else{fallbackCopy(wor);done();}}
 function fallbackCopy(text){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(err){}document.body.removeChild(ta);}
-function scanDom(){document.getElementById('n-domzone').style.display='none';document.getElementById('n-domscan').style.display='block';}
-function serMode(m){document.getElementById('serseg1').classList.toggle('sel',m===1);document.getElementById('serseg2').classList.toggle('sel',m===2);document.getElementById('n-serscan').style.display=m===1?'block':'none';document.getElementById('n-sertype').style.display=m===2?'block':'none';}
+function scanDom(){document.getElementById('n-domscan').style.display='block';}
+function domMode(m){document.getElementById('domseg1').classList.toggle('sel',m===1);document.getElementById('domseg2').classList.toggle('sel',m===2);document.getElementById('n-domzone').style.display=m===1?'block':'none';document.getElementById('n-domtype').style.display=m===2?'block':'none';}
+function serMode(m){document.getElementById('serseg1').classList.toggle('sel',m===1);document.getElementById('serseg2').classList.toggle('sel',m===2);document.getElementById('n-serscan').style.display=m===1?'block':'none';document.getElementById('n-sertype').style.display=m===2?'block':'none';if(m===2&&document.getElementById('n-serresult').style.display==='block'){document.getElementById('n-serial').value=document.getElementById('serval').textContent;}}
 const demoSerials=["0013301624","0013301627","0013310784","0013310808","0013261270","0013280939","0012973151","0012973142"];
 function scanSerial(){const s=demoSerials[st.newIdx%demoSerials.length];document.getElementById('serline').textContent=s;document.getElementById('serval').textContent=s;document.getElementById('n-serresult').style.display='block';}
-function acceptSerial(){if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
+function saveBattery(){if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
  if(st.newDone.length>=labels().length){renderTabs('newtabs',st.newIdx,st.newDone);go('s-old');}
  else{st.newIdx=labels().findIndex((_,i)=>!st.newDone.includes(i));renderTabs('newtabs',st.newIdx,st.newDone);
- document.getElementById('n-serresult').style.display='none';document.getElementById('n-ocv').value='';document.getElementById('n-domzone').style.display='block';document.getElementById('n-domscan').style.display='none';document.getElementById('n-serial').value='';}}
+ document.getElementById('n-serresult').style.display='none';document.getElementById('n-domscan').style.display='none';
+ document.getElementById('n-ocv').value='';document.getElementById('n-dom').value='';document.getElementById('n-serial').value='';document.getElementById('n-comment').value='';
+ domMode(1);serMode(1);}}
 function scanOld(){document.getElementById('o-scan').style.display='block';}
 function acceptOld(){markOld();}
 function oldNA(){markOld();}
