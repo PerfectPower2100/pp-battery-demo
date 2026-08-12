@@ -233,12 +233,12 @@ input:focus{outline:2px solid var(--blue)}
     <div id="n-sertype" style="display:none;margin-top:8px">
       <input type="text" id="n-serial" placeholder="Type Serial Number (10 digits)" inputmode="numeric" maxlength="10">
     </div>
-    <button class="btn green" id="savenewbtn" onclick="saveBattery()">Save this Battery, Next Battery →</button>
+    <button class="btn green" id="savenewbtn" onclick="saveBattery()">Save this Battery, Next Battery</button>
     <label>Comment - Optional</label>
     <input type="text" id="n-comment" placeholder="e.g. replacement looks used">
     <p class="note">📸 A photo is kept automatically either way - if anything's ever queried, the evidence already exists.</p>
   </div>
-  <div class="footer"><button class="btn ghost" onclick="go('s-confirm')">Back</button><button class="btn primary" onclick="go('s-old')">Old batteries →</button></div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-confirm')">Back</button></div>
 </section>
 
 <!-- 4: old batteries -->
@@ -259,10 +259,10 @@ input:focus{outline:2px solid var(--blue)}
       <div><label>Or type serial</label><input type="text" id="o-serial" placeholder="N2002172977"></div>
       <div><label>Mfg date</label><input type="text" id="o-date" placeholder="17Feb20"></div>
     </div>
-    <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery, Next Battery →</button>
+    <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery, Next Battery</button>
     <button class="btn ghost small" style="display:block;width:100%;margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
   </div>
-  <div class="footer"><button class="btn ghost" onclick="go('s-new')">Back</button><button class="btn primary" onclick="go('s-string')">String test →</button></div>
+  <div class="footer"><button class="btn ghost" onclick="go('s-new')">Back</button></div>
 </section>
 
 <!-- 5: string test -->
@@ -381,7 +381,7 @@ function loadNew(i){const d=st.newData[i];
 function updateNewBar(){const done=st.newDone.includes(st.newIdx);const L=labels()[st.newIdx];
  const bar=document.getElementById('newreview');const btn=document.getElementById('savenewbtn');
  if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
- else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery →';}}
+ else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery';}}
 function saveBattery(){st.newData[st.newIdx]=captureNew();
  if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
  const next=labels().findIndex((_,i)=>!st.newDone.includes(i));
@@ -407,7 +407,7 @@ function loadOld(i){const d=st.oldData[i];
 function updateOldBar(){const done=st.oldDone.includes(st.oldIdx);const L=labels()[st.oldIdx];
  const bar=document.getElementById('oldreview');const btn=document.getElementById('saveoldbtn');
  if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
- else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery →';}}
+ else{bar.style.display='none';btn.textContent='Save this Battery, Next Battery';}}
 function markOld(){if(!st.oldDone.includes(st.oldIdx))st.oldDone.push(st.oldIdx);
  const next=labels().findIndex((_,i)=>!st.oldDone.includes(i));
  if(next<0){renderTabs('oldtabs',st.oldIdx,st.oldDone);go('s-string');}
