@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Mock-up 4 - The Digital Worksheet</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Georgia,'Times New Roman',serif;background:#e8e4d8;max-width:480px;margin:0 auto;min-height:100vh;color:#2e2a22}
+.tag{position:fixed;top:10px;right:10px;background:#b3402a;color:#fff;font-size:11px;font-weight:800;padding:5px 10px;border-radius:3px;z-index:50;font-family:-apple-system,sans-serif}
+.sheet{background:#fdfaf1;margin:14px;border:1px solid #d8d2c0;box-shadow:0 4px 14px rgba(60,50,30,.18);padding:20px 16px 30px}
+.shead{border-bottom:3px double #2e2a22;padding-bottom:12px;margin-bottom:6px}
+.shead h1{font-size:21px;margin:0;letter-spacing:.5px}
+.shead .co{font-size:12px;color:#6e6552;letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13.5px;padding:10px 0;border-bottom:1px solid #d8d2c0}
+.meta b{font-family:ui-monospace,monospace;font-size:13px}
+.prognote{position:sticky;top:0;background:#fff6cf;border:1px solid #e0d089;padding:9px 12px;font-size:14px;z-index:30;margin:12px 0;box-shadow:0 2px 6px rgba(60,50,30,.12)}
+.sec{font-size:15px;letter-spacing:2px;text-transform:uppercase;margin:22px 0 6px;border-bottom:2px solid #2e2a22;padding-bottom:4px;font-weight:700}
+.row{border-bottom:1px dotted #b8b09a;padding:13px 2px}
+.rowtop{display:flex;align-items:center;gap:12px;cursor:pointer}
+.circ{width:34px;height:34px;min-width:34px;border:2.5px solid #8a8168;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;font-family:-apple-system,sans-serif}
+.row.done .circ{background:#3e7d34;border-color:#3e7d34}
+.rowtop .bid{font-size:19px;font-weight:700;font-family:ui-monospace,monospace}
+.rowtop .sum{font-size:13.5px;color:#6e6552;margin-left:auto;text-align:right;font-family:ui-monospace,monospace}
+.row.done .sum{color:#3e7d34}
+.pen{margin-left:auto;font-size:17px;color:#8a8168}
+.exp{display:none;padding:12px 0 4px 46px}
+.row.open .exp{display:block}
+.exp label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px;font-family:-apple-system,sans-serif;color:#5a523f}
+.exp input{width:100%;border:1.5px solid #b8b09a;background:#fffdf6;padding:13px;font-size:17px;font-family:ui-monospace,monospace}
+.exp input:focus{outline:2px solid #b3402a}
+.scanb{display:block;width:100%;border:1.5px dashed #b3402a;background:#fdf1ea;color:#b3402a;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;margin-top:8px}
+.gotv{background:#eef6e8;border:1.5px solid #3e7d34;color:#2c5a25;padding:10px 12px;font-size:14px;font-family:ui-monospace,monospace;margin-top:8px;display:none}
+.tickoff{display:block;width:100%;border:0;background:#3e7d34;color:#fff;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:-apple-system,sans-serif;margin-top:12px}
+.na{display:block;width:100%;border:1.5px solid #8a8168;background:none;color:#6e6552;padding:11px;font-size:13.5px;cursor:pointer;font-family:-apple-system,sans-serif;margin-top:8px}
+.stamp{display:block;width:100%;border:4px double #b3402a;background:#fdf1ea;color:#b3402a;padding:20px;font-size:20px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:26px;font-family:Georgia,serif;transform:rotate(-.6deg)}
+.stamp:disabled{opacity:.45}
+.foot{font-size:12px;color:#8a8168;text-align:center;margin-top:14px;font-style:italic}
+.doneov{position:fixed;inset:0;background:rgba(46,42,34,.55);display:none;align-items:center;justify-content:center;z-index:60;padding:24px}
+.doneov .card{background:#fdfaf1;border:1px solid #d8d2c0;padding:30px 22px;text-align:center;max-width:340px}
+.doneov h2{margin:6px 0}
+.doneov p{font-size:14.5px;line-height:1.7;color:#5a523f}
+.doneov .st2{display:inline-block;border:3px double #3e7d34;color:#3e7d34;padding:8px 18px;font-weight:800;letter-spacing:3px;transform:rotate(-4deg);margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="tag">MOCK-UP #4</div>
+<div class="sheet">
+ <div class="shead"><h1>Battery Data Worksheet</h1><div class="co">Perfect Power · nbn Field Services</div></div>
+ <div class="meta"><span>WOR <b>201311802073</b></span><span>Size <b>62A</b></span><span>Tech <b>Medium</b></span><span>Date <b id="today"></b></span><span>Site <b style="font-family:Georgia">Brookvale</b></span></div>
+ <div class="prognote" id="prog">☐ 0 of 9 lines ticked - tap any line to fill it in</div>
+ <div class="sec">1 · New Batteries In</div>
+ <div id="newrows"></div>
+ <div class="sec">2 · Old Batteries Out</div>
+ <div id="oldrows"></div>
+ <div class="sec">3 · String Test</div>
+ <div class="row" id="strrow">
+  <div class="rowtop" onclick="toggleRow('strrow')"><div class="circ">✓</div><div class="bid">A</div><div class="sum" id="str-sum">tap to fill</div><span class="pen">✎</span></div>
+  <div class="exp">
+   <label>String A Voltage (V)</label><input type="number" inputmode="decimal" id="strv" placeholder="52.0">
+   <label>String A Current (A)</label><input type="number" inputmode="decimal" id="stra" placeholder="5.9">
+   <button class="tickoff" onclick="tickString()">Tick it off ✓</button>
+  </div>
+ </div>
+ <button class="stamp" id="stamp" disabled onclick="submitSheet()">Submit Sheet</button>
+ <div class="foot">Signed digitally · photos attached automatically · no pen was harmed</div>
+</div>
+<div class="doneov" id="ov"><div class="card">
+ <div class="st2">FILED ✓</div>
+ <h2>Sheet submitted</h2>
+ <p>62AH Battery WOR201311802073.xlsx<br>Filed to the nbn Drive WOR folder<br>Emailed to nbn@ with every photo attached</p>
+ <button class="tickoff" onclick="location.reload()">Restart demo</button>
+</div></div>
+<script>
+const B=['A1','A2','A3','A4'];
+const SERS=['0013301624','0013301627','0013310784','0013310808'];
+const OLDS=['N2002172977','N2002172981','N2001988014','N2002171205'];
+const done={};
+document.getElementById('today').textContent=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+function rowNew(i){return '<div class="row" id="n'+i+'">'+
+ '<div class="rowtop" onclick="toggleRow(\'n'+i+'\')"><div class="circ">✓</div><div class="bid">'+B[i]+'</div><div class="sum" id="n'+i+'-sum">tap to fill</div><span class="pen">✎</span></div>'+
+ '<div class="exp">'+
+ '<label>OCV - Pre installation (V)</label><input type="number" inputmode="decimal" id="n'+i+'-ocv" placeholder="13.1">'+
+ '<label>Manufacture Date</label><button class="scanb" onclick="scanNew('+i+')">📷 Scan sticker + serial in one go</button>'+
+ '<div class="gotv" id="n'+i+'-got"></div>'+
+ '<button class="tickoff" onclick="tickNew('+i+')">Tick it off ✓</button>'+
+ '</div></div>';}
+function rowOld(i){return '<div class="row" id="o'+i+'">'+
+ '<div class="rowtop" onclick="toggleRow(\'o'+i+'\')"><div class="circ">✓</div><div class="bid">'+B[i]+'</div><div class="sum" id="o'+i+'-sum">tap to fill</div><span class="pen">✎</span></div>'+
+ '<div class="exp">'+
+ '<label>Barcode - serial and date land together</label><button class="scanb" onclick="scanOld('+i+')">📷 Scan the barcode</button>'+
+ '<div class="gotv" id="o'+i+'-got"></div>'+
+ '<button class="tickoff" onclick="tickOld('+i+')">Tick it off ✓</button>'+
+ '<button class="na" onclick="naOld('+i+')">No sticker - mark NA and tick</button>'+
+ '</div></div>';}
+document.getElementById('newrows').innerHTML=B.map((_,i)=>rowNew(i)).join('');
+document.getElementById('oldrows').innerHTML=B.map((_,i)=>rowOld(i)).join('');
+function toggleRow(id){const r=document.getElementById(id);document.querySelectorAll('.row.open').forEach(x=>{if(x.id!==id)x.classList.remove('open')});r.classList.toggle('open');}
+function scanNew(i){const g=document.getElementById('n'+i+'-got');g.style.display='block';g.innerHTML='📷 Batch 1125 (Nov 25) · SN '+SERS[i]+' ✓';}
+function tickNew(i){const r=document.getElementById('n'+i);const ocv=document.getElementById('n'+i+'-ocv').value||'13.1';
+ r.classList.add('done');r.classList.remove('open');
+ document.getElementById('n'+i+'-sum').textContent=ocv+'V · 1125 · '+SERS[i];done['n'+i]=1;prog();}
+function scanOld(i){const g=document.getElementById('o'+i+'-got');g.style.display='block';g.innerHTML='📷 '+OLDS[i]+' · Mfg Feb 2020 ✓';}
+function tickOld(i){const r=document.getElementById('o'+i);r.classList.add('done');r.classList.remove('open');
+ document.getElementById('o'+i+'-sum').textContent=OLDS[i];done['o'+i]=1;prog();}
+function naOld(i){const r=document.getElementById('o'+i);r.classList.add('done');r.classList.remove('open');
+ document.getElementById('o'+i+'-sum').textContent='NA - no sticker';done['o'+i]=1;prog();}
+function tickString(){const r=document.getElementById('strrow');r.classList.add('done');r.classList.remove('open');
+ const v=document.getElementById('strv').value||'52.0',a=document.getElementById('stra').value||'5.9';
+ document.getElementById('str-sum').textContent=v+'V · '+a+'A';done['s']=1;prog();}
+function prog(){const n=Object.keys(done).length;
+ const p=document.getElementById('prog');
+ p.textContent=(n>=9?'✔ All 9 lines ticked - hit Submit Sheet below':'☐ '+n+' of 9 lines ticked - keep going');
+ if(n>=9){p.style.background='#eef6e8';p.style.borderColor='#3e7d34';document.getElementById('stamp').disabled=false;}}
+function submitSheet(){document.getElementById('ov').style.display='flex';}
+</script>
+</body>
+</html>
