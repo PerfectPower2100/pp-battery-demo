@@ -100,6 +100,8 @@ input:focus{outline:2px solid var(--blue)}
 .seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin-top:4px}
 .seg button{flex:1;border:0;background:#fff;padding:11px;font-weight:700;font-size:13px;cursor:pointer;color:#667}
 .seg button.sel{background:var(--blue);color:#fff}
+.btn.flag{background:#fff;color:#556;border:2px solid var(--line);font-size:15px}
+.btn.flag.flagon{background:#fff3cd;border-color:#d9a400;color:#7a5c00}
 </style>
 </head>
 <body>
@@ -250,7 +252,6 @@ input:focus{outline:2px solid var(--blue)}
   <div class="batt-tabs" id="oldtabs"></div>
   <div class="card">
     <div class="reviewbar" id="oldreview"></div>
-    <div class="warn" id="o-nabar" style="display:none">🚫 This one was marked NA - no sticker.</div>
     <label style="margin-top:0;font-weight:800">Serial Number and Manufacture Date - one scan of the barcode fills in both</label>
     <div class="seg"><button id="oldseg1" class="sel" onclick="oldMode(1)">📷 Camera read</button><button id="oldseg2" onclick="oldMode(2,1)">⌨️ Type it</button></div>
     <div id="o-camzone" style="margin-top:8px">
@@ -267,8 +268,12 @@ input:focus{outline:2px solid var(--blue)}
       <input type="text" id="o-date" placeholder="Type MMYY Only" inputmode="numeric" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')" onblur="this.value=padDate(this.value);checkDate('o-date','o-datenag')">
       <div class="mismatch" id="o-datenag"></div>
     </div>
+    <button class="btn flag" id="o-noser" data-label="No Serial Number" onclick="toggleFlag('o-noser')">No Serial Number</button>
+    <button class="btn flag" id="o-nodom" data-label="No Date of Manufacture" onclick="toggleFlag('o-nodom')">No Date of Manufacture</button>
+    <p class="note" id="o-flagnote" style="display:none">✓ Already noted on the sheet for you - no need to type it in the comment.</p>
     <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery<br>Next Battery</button>
-    <button class="btn ghost small" style="display:block;width:100%;margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
+    <label>Comment - Optional</label>
+    <input type="text" id="o-comment" oninput="this.value=capFirst(this.value)">
   </div>
   <button class="btn green" id="finishold" style="display:none" onclick="finishOld()">Save all Old Battery data<br>Move to String Test</button>
   <div class="footer"><button class="btn ghost" onclick="go('s-new')">Back to New Batteries</button></div>
@@ -373,7 +378,7 @@ function checkDate(inp,nag){const el=document.getElementById(inp);const n=docume
  let msg='';
  if(mm<1||mm>12)msg='"'+v.slice(0,2)+'" isn\'t a month.';
  else if(yy>curYY)msg='20'+v.slice(2)+' is in the future.';
- if(msg){n.style.display='block';n.innerHTML='⚠️ '+msg+' Probably a typo.<button class="btn small" style="display:block;width:100%;margin-top:8px;background:#d84343;color:#fff" onclick="fixDate(\''+inp+'\',\''+nag+'\')">Fix it</button><button class="btn ghost small" style="display:block;width:100%;margin-top:6px" onclick="document.getElementById(\''+nag+'\').style.display=\'none\'">It\'s right - keep it</button>';}
+ if(msg){n.style.display='block';n.innerHTML=msg+'<button class="btn small" style="display:block;width:100%;margin-top:8px;background:#d84343;color:#fff" onclick="fixDate(\''+inp+'\',\''+nag+'\')">Change the Date</button><button class="btn ghost small" style="display:block;width:100%;margin-top:6px" onclick="document.getElementById(\''+nag+'\').style.display=\'none\'">It\'s right - keep it</button>';}
  else n.style.display='none';}
 function fixDate(inp,nag){const el=document.getElementById(inp);el.value='';document.getElementById(nag).style.display='none';el.focus();}
 function scanDom(){document.getElementById('n-domscan').style.display='block';}
@@ -391,9 +396,8 @@ function captureNew(){
   serScan:serScanned, serial:serScanned?document.getElementById('serval').textContent:(serScanSel?'':document.getElementById('n-serial').value),
   comment:capFirst(document.getElementById('n-comment').value)};}
 function stashNew(){const d=captureNew();if(d.ocv||d.dom||d.serial||d.comment||d.domScan||d.serScan||st.newData[st.newIdx])st.newData[st.newIdx]=d;}
-function stashOld(){if(document.getElementById('o-nabar').style.display==='block')return;
- const d=captureOld();
- if(d.scan||d.serial||d.date||st.oldData[st.oldIdx])st.oldData[st.oldIdx]=d;}
+function stashOld(){const d=captureOld();
+ if(d.scan||d.serial||d.date||d.noSer||d.noDom||d.comment||st.oldData[st.oldIdx])st.oldData[st.oldIdx]=d;}
 function loadNew(i){const d=st.newData[i];
  document.getElementById('n-serresult').style.display='none';document.getElementById('n-domscan').style.display='none';document.getElementById('n-domnag').style.display='none';
  ['n-ocv','n-dom','n-serial','n-comment'].forEach(id=>document.getElementById(id).value='');
@@ -424,21 +428,27 @@ function scanOld(){const p=demoOld[st.oldIdx%demoOld.length];
  document.getElementById('oldline').textContent='▮▮ ▮ ▮▮▮ '+p[0]+' ▮ ▮▮ ▮▮';
  document.getElementById('oldval').textContent=p[0];document.getElementById('olddate').textContent=p[1];
  document.getElementById('o-scan').style.display='block';}
+function toggleFlag(id){const b=document.getElementById(id);const on=b.classList.toggle('flagon');b.textContent=(on?'✓ ':'')+b.dataset.label;updateFlagNote();}
+function setFlag(id,on){const b=document.getElementById(id);b.classList.toggle('flagon',!!on);b.textContent=(on?'✓ ':'')+b.dataset.label;}
+function updateFlagNote(){const on=document.getElementById('o-noser').classList.contains('flagon')||document.getElementById('o-nodom').classList.contains('flagon');document.getElementById('o-flagnote').style.display=on?'block':'none';}
 function captureOld(){const cam=document.getElementById('oldseg1').classList.contains('sel');
  const scanned=cam&&document.getElementById('o-scan').style.display==='block';
- if(scanned)return {scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent};
- return {serial:cam?'':document.getElementById('o-serial').value,date:cam?'':padDate(document.getElementById('o-date').value)};}
+ const noSer=document.getElementById('o-noser').classList.contains('flagon');
+ const noDom=document.getElementById('o-nodom').classList.contains('flagon');
+ const comment=capFirst(document.getElementById('o-comment').value);
+ if(scanned)return {scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent,noSer:noSer,noDom:noDom,comment:comment};
+ return {serial:cam?'':document.getElementById('o-serial').value,date:cam?'':padDate(document.getElementById('o-date').value),noSer:noSer,noDom:noDom,comment:comment};}
 function saveOldBattery(){const wasDone=st.oldDone.includes(st.oldIdx);st.oldData[st.oldIdx]=captureOld();markOld(wasDone);}
-function oldNA(){const wasDone=st.oldDone.includes(st.oldIdx);st.oldData[st.oldIdx]={na:true};markOld(wasDone);}
 function finishOld(){stashOld();go('s-string');}
 function loadOld(i){const d=st.oldData[i];
- document.getElementById('o-scan').style.display='none';document.getElementById('o-nabar').style.display='none';document.getElementById('o-datenag').style.display='none';
- document.getElementById('o-serial').value='';document.getElementById('o-date').value='';
+ document.getElementById('o-scan').style.display='none';document.getElementById('o-datenag').style.display='none';
+ document.getElementById('o-serial').value='';document.getElementById('o-date').value='';document.getElementById('o-comment').value='';
+ setFlag('o-noser',false);setFlag('o-nodom',false);
  oldMode(1);
- if(d){if(d.na){document.getElementById('o-nabar').style.display='block';}
-  else if(d.scan){document.getElementById('oldline').textContent='▮▮ ▮ ▮▮▮ '+d.serial+' ▮ ▮▮ ▮▮';document.getElementById('oldval').textContent=d.serial;document.getElementById('olddate').textContent=d.date;document.getElementById('o-scan').style.display='block';}
+ if(d){setFlag('o-noser',d.noSer);setFlag('o-nodom',d.noDom);document.getElementById('o-comment').value=d.comment||'';
+  if(d.scan){document.getElementById('oldline').textContent='▮▮ ▮ ▮▮▮ '+d.serial+' ▮ ▮▮ ▮▮';document.getElementById('oldval').textContent=d.serial;document.getElementById('olddate').textContent=d.date;document.getElementById('o-scan').style.display='block';}
   else if(d.serial||d.date){oldMode(2);document.getElementById('o-serial').value=d.serial||'';document.getElementById('o-date').value=d.date||'';}}
- updateOldBar();}
+ updateFlagNote();updateOldBar();}
 function updateOldBar(){const done=st.oldDone.includes(st.oldIdx);const L=labels()[st.oldIdx];
  const bar=document.getElementById('oldreview');const btn=document.getElementById('saveoldbtn');
  const isLast=!done&&labels().every((_,i)=>i===st.oldIdx||st.oldDone.includes(i));
@@ -454,6 +464,11 @@ function buildSummary(){const c=st.job;const f=c.size+"H Battery "+c.wor+".xlsx"
   if(d&&(d.ocv||d.serial||d.dom))return l+' ✓ '+(d.ocv?d.ocv+'V':'-')+' - '+(d.dom||'-')+' - '+(d.serial||'-')+(d.comment?'<br>&nbsp;&nbsp;💬 '+d.comment:'');
   return l+' ✓ captured';}).join('<br>');
  h+='<div class="summary-batt">'+rows+'</div>';
+ const orows=labels().map(function(l,i){const d=st.oldData[i]||{};
+  const auto=[d.noSer?'No Serial Number':'',d.noDom?'No Date of Manufacture':''].filter(Boolean).join('. ');
+  const cmt=[auto,d.comment||''].filter(Boolean).join('. ');
+  return l+' ✓ '+(d.serial||'-')+(cmt?'<br>&nbsp;&nbsp;💬 '+cmt:'');}).join('<br>');
+ h+='<div class="summary-batt">'+orows+'</div>';
  if(st.qty!==c.qty)h+='<div class="mismatch" style="display:block">Auto-comment added: "Novus stated '+c.qty+' batteries - '+st.qty+' found and replaced onsite."</div>';
  document.getElementById('sumcard').innerHTML=h;go('s-review');}
 function submitJob(){document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor+".xlsx";document.getElementById('d-tech').textContent=st.tech||"Medium";go('s-done');}
