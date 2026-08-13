@@ -309,15 +309,13 @@ input:focus{outline:2px solid var(--blue)}
 
 <!-- 7: success -->
 <section class="screen" id="s-done">
-  <div class="big-ok">🎉</div>
-  <h2 class="center">Job submitted</h2>
-  <p class="sub center">That's the paperwork done. Wrap up and roll to the next one.</p>
+  <div class="center" style="margin:26px 0 4px"><span style="font-size:25px;font-weight:800" id="d-wor"></span><button class="copybtn" style="font-size:20px" onclick="copyWor(event, st.job.wor, this)">⧉</button></div>
+  <h2 class="center" style="margin-bottom:14px">Battery excel submitted</h2>
   <div class="card">
-    <div class="kv"><span>Spreadsheet</span><b id="d-file"></b></div>
-    <div class="kv"><span>Filed to</span><b>nbn Drive → WOR folder</b></div>
+    <div class="kv"><span>Spreadsheet</span><span style="display:flex;align-items:center;gap:2px"><b id="d-file"></b><button class="copybtn" onclick="copyWor(event, st.job.size+'H Battery '+st.job.wor, this)">⧉</button></span></div>
+    <div class="kv"><span>Automatically Filed to</span><b>nbn Drive → Battery Jobs WOR folder</b></div>
     <div class="kv"><span>Email to nbn@</span><b>Sent - xlsx + photos attached</b></div>
     <div class="kv"><span>Completed by</span><b id="d-tech"></b></div>
-    <div class="kv"><span>Pens used</span><b>0 🖊️🚫</b></div>
   </div>
   <button class="btn primary" onclick="location.reload()">Restart demo</button>
 </section>
@@ -480,7 +478,7 @@ function buildSummary(){const c=st.job;const f=c.size+"H Battery "+c.wor;
  h+='<div class="summary-batt">'+orows+'</div>';
  if(st.qty!==c.qty)h+='<div class="mismatch" style="display:block">Auto-comment added: "Novus stated '+c.qty+' batteries - '+st.qty+' found and replaced onsite."</div>';
  document.getElementById('sumcard').innerHTML=h;go('s-review');}
-function submitJob(){document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor+".xlsx";document.getElementById('d-tech').textContent=st.tech||"Medium";go('s-done');}
+function submitJob(){document.getElementById('d-wor').textContent=st.job.wor;document.getElementById('d-file').textContent=st.job.size+"H Battery "+st.job.wor;document.getElementById('d-tech').textContent=st.tech||"Medium";go('s-done');}
 // fake offline toggle every so often to show the badge
 setInterval(()=>{const b=document.getElementById('netbadge');const off=b.classList.toggle('off');b.textContent=off?'OFFLINE - saving locally':'ONLINE';},9000);
 document.getElementById('logo').src=PP_LOGO;
