@@ -122,7 +122,6 @@ input:focus{outline:2px solid var(--blue)}
 <div class="splash" id="splash" onclick="endSplash()">
   <img id="splash-img" alt="" style="display:none">
   <div class="veil"></div>
-  <div class="zap" id="splash-zap">⚡</div>
   <div class="nm" id="splash-name"></div>
   <div class="tag2" id="splash-tag"></div>
 </div>
@@ -242,7 +241,7 @@ input:focus{outline:2px solid var(--blue)}
     <label style="font-weight:800">Serial Number - etched on the case</label>
     <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2,1)">⌨️ Type it</button></div>
     <div id="n-serscan" style="margin-top:8px">
-      <button class="btn yellow small" style="display:block;width:100%" onclick="scanSerial()">📷 Read serial</button>
+      <button class="btn yellow small" style="display:block;width:100%" onclick="scanSerial()">📷 Scan Serial with your Camera</button>
       <div id="n-serresult" style="display:none">
         <div class="scanline" id="serline">0013301624</div>
         <div class="confirmbar">✅ <div>Read: <b id="serval">0013301624</b> ✓<br><span class="note" style="margin:0">Wrong? Tap "Type it" above to correct it.</span></div></div>
@@ -352,8 +351,8 @@ function pickName(n){st.tech=n;
  else go('s-jobs');}
 function showSplash(n,s){const im=document.getElementById('splash-img');
  const photo=(typeof TECH_PHOTOS!=='undefined')&&TECH_PHOTOS[n];
- if(photo){im.src=photo;im.style.display='block';document.getElementById('splash-zap').style.display='none';}
- else{im.style.display='none';document.getElementById('splash-zap').style.display='block';}
+ if(photo){im.src=photo;im.style.display='block';}
+ else{im.style.display='none';}
  document.getElementById('splash-name').textContent=n.toUpperCase();
  document.getElementById('splash-tag').textContent=s.tag;
  document.getElementById('splash').classList.add('on');
