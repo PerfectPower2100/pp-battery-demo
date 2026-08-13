@@ -219,7 +219,7 @@ input:focus{outline:2px solid var(--blue)}
       </div>
     </div>
     <div id="n-domtype" style="display:none;margin-top:8px">
-      <input type="text" id="n-dom" placeholder="Type MMYY only" inputmode="numeric">
+      <input type="text" id="n-dom" placeholder="Type MMYY only" inputmode="numeric" maxlength="4" onblur="this.value=padDate(this.value)">
     </div>
     <label style="font-weight:800">Serial Number - etched on the case</label>
     <div class="seg"><button id="serseg1" class="sel" onclick="serMode(1)">📷 Camera read</button><button id="serseg2" onclick="serMode(2,1)">⌨️ Type it</button></div>
@@ -262,7 +262,7 @@ input:focus{outline:2px solid var(--blue)}
       <label style="font-weight:800">Type Serial Number</label>
       <input type="text" id="o-serial" placeholder="e.g. N2002172977">
       <label style="font-weight:800">Manufacture Date</label>
-      <input type="text" id="o-date" placeholder="Type MMYY Only" inputmode="numeric">
+      <input type="text" id="o-date" placeholder="Type MMYY Only" inputmode="numeric" maxlength="4" onblur="this.value=padDate(this.value)">
     </div>
     <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery, Next Battery</button>
     <button class="btn ghost small" style="display:block;width:100%;margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
@@ -361,6 +361,7 @@ function copyWor(e, wor, btn){e.stopPropagation();
  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(wor).then(done).catch(function(){fallbackCopy(wor);done();});}
  else{fallbackCopy(wor);done();}}
 function fallbackCopy(text){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(err){}document.body.removeChild(ta);}
+function padDate(v){v=(v||'').trim();return /^\d{3}$/.test(v)?'0'+v:v;}
 function scanDom(){document.getElementById('n-domscan').style.display='block';}
 function domMode(m,f){document.getElementById('domseg1').classList.toggle('sel',m===1);document.getElementById('domseg2').classList.toggle('sel',m===2);document.getElementById('n-domzone').style.display=m===1?'block':'none';document.getElementById('n-domtype').style.display=m===2?'block':'none';if(m===2&&f)document.getElementById('n-dom').focus();}
 function serMode(m,f){document.getElementById('serseg1').classList.toggle('sel',m===1);document.getElementById('serseg2').classList.toggle('sel',m===2);document.getElementById('n-serscan').style.display=m===1?'block':'none';document.getElementById('n-sertype').style.display=m===2?'block':'none';if(m===2&&document.getElementById('n-serresult').style.display==='block'){document.getElementById('n-serial').value=document.getElementById('serval').textContent;}if(m===2&&f)document.getElementById('n-serial').focus();}
@@ -372,7 +373,7 @@ function captureNew(){
  const domScanned=domScanSel&&document.getElementById('n-domscan').style.display==='block';
  const serScanned=serScanSel&&document.getElementById('n-serresult').style.display==='block';
  return {ocv:document.getElementById('n-ocv').value,
-  domScan:domScanned, dom:domScanned?'1125':(domScanSel?'':document.getElementById('n-dom').value),
+  domScan:domScanned, dom:domScanned?'1125':(domScanSel?'':padDate(document.getElementById('n-dom').value)),
   serScan:serScanned, serial:serScanned?document.getElementById('serval').textContent:(serScanSel?'':document.getElementById('n-serial').value),
   comment:document.getElementById('n-comment').value};}
 function stashNew(){const d=captureNew();if(d.ocv||d.dom||d.serial||d.comment||d.domScan||d.serScan||st.newData[st.newIdx])st.newData[st.newIdx]=d;}
@@ -410,7 +411,7 @@ function scanOld(){const p=demoOld[st.oldIdx%demoOld.length];
 function captureOld(){const cam=document.getElementById('oldseg1').classList.contains('sel');
  const scanned=cam&&document.getElementById('o-scan').style.display==='block';
  if(scanned)return {scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent};
- return {serial:cam?'':document.getElementById('o-serial').value,date:cam?'':document.getElementById('o-date').value};}
+ return {serial:cam?'':document.getElementById('o-serial').value,date:cam?'':padDate(document.getElementById('o-date').value)};}
 function saveOldBattery(){st.oldData[st.oldIdx]=captureOld();markOld();}
 function oldNA(){st.oldData[st.oldIdx]={na:true};markOld();}
 function loadOld(i){const d=st.oldData[i];
