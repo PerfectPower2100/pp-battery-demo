@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Mock-up 6 - Point &amp; Shoot</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#000;max-width:480px;margin:0 auto;height:100vh;overflow:hidden;color:#eee}
+.tag{position:fixed;top:10px;right:10px;background:#fff;color:#000;font-size:11px;font-weight:900;padding:5px 10px;border-radius:20px;z-index:80}
+.vf{position:absolute;inset:0;max-width:480px;margin:0 auto;background:radial-gradient(ellipse at 50% 40%,#2a3238 0%,#12161a 70%,#000 100%)}
+.corner{position:absolute;width:46px;height:46px;border:4px solid rgba(120,255,170,.85)}
+.c1{top:120px;left:34px;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
+.c2{top:120px;right:34px;border-left:0;border-bottom:0;border-radius:0 8px 0 0}
+.c3{bottom:250px;left:34px;border-right:0;border-top:0;border-radius:0 0 0 8px}
+.c4{bottom:250px;right:34px;border-left:0;border-top:0;border-radius:0 0 8px 0}
+.hud{position:absolute;top:0;left:0;right:0;padding:14px 16px;background:linear-gradient(rgba(0,0,0,.75),transparent);z-index:20}
+.hud .job{font-family:ui-monospace,monospace;font-size:13px;color:#9fe8bc;letter-spacing:1px}
+.hud .dots{display:flex;gap:5px;margin-top:8px}
+.hud .dots i{flex:1;height:5px;border-radius:2px;background:rgba(255,255,255,.18)}
+.hud .dots i.on{background:#78ffaa}
+.want{position:absolute;left:0;right:0;top:38%;text-align:center;z-index:20;padding:0 30px}
+.want .lbl{font-size:12px;letter-spacing:4px;color:#9fe8bc;font-weight:800;text-transform:uppercase}
+.want .what{font-size:26px;font-weight:900;margin-top:8px;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.want .tip{font-size:14px;color:#aab;margin-top:8px}
+.shutterbar{position:absolute;bottom:0;left:0;right:0;padding:22px 0 34px;display:flex;align-items:center;justify-content:center;gap:44px;background:linear-gradient(transparent,rgba(0,0,0,.85) 40%);z-index:30}
+.shutter{width:88px;height:88px;border-radius:50%;border:6px solid #fff;background:rgba(255,255,255,.14);cursor:pointer;position:relative}
+.shutter::after{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff}
+.shutter:active::after{background:#78ffaa}
+.sidebtn{width:62px;height:62px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(0,0,0,.4);color:#fff;font-size:11px;font-weight:800;cursor:pointer;line-height:1.2}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:60}
+.flash.go{animation:fl .28s}
+@keyframes fl{20%{opacity:.9}100%{opacity:0}}
+.toast{position:absolute;left:16px;right:16px;bottom:170px;background:rgba(10,25,16,.92);border:2px solid #78ffaa;border-radius:14px;padding:14px;z-index:40;font-family:ui-monospace,monospace;font-size:15px;color:#c9ffdf;display:none}
+.toast b{color:#78ffaa}
+.keypad{position:absolute;inset:0;background:rgba(0,0,0,.88);z-index:70;display:none;flex-direction:column;justify-content:flex-end;max-width:480px;margin:0 auto}
+.keypad .kq{text-align:center;font-size:22px;font-weight:900;padding:0 30px 6px}
+.keypad .kv{text-align:center;font-family:ui-monospace,monospace;font-size:46px;color:#78ffaa;min-height:60px}
+.keys{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:16px 20px 30px}
+.keys button{border:0;border-radius:14px;padding:20px;font-size:26px;font-weight:800;background:#20262c;color:#fff;cursor:pointer}
+.keys button:active{background:#78ffaa;color:#000}
+.keys .okk{background:#78ffaa;color:#000;font-size:19px}
+.sheet{position:absolute;inset:0;background:#f4f6f8;color:#223;z-index:75;display:none;overflow-y:auto;max-width:480px;margin:0 auto;padding:24px 18px 110px}
+.sheet h2{margin:4px 0 2px}
+.sheet .s{color:#678;font-size:13px;margin-bottom:16px}
+.srow{display:flex;gap:10px;background:#fff;border:1px solid #dde;border-radius:10px;padding:12px;margin-bottom:8px;font-family:ui-monospace,monospace;font-size:13.5px;align-items:center}
+.srow .ok{color:#2c8a44;font-size:17px}
+.sendbar{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;padding:14px 18px 24px;background:#f4f6f8;z-index:78}
+.bigsend{display:block;width:100%;border:0;border-radius:16px;padding:22px;font-size:19px;font-weight:900;background:#2c8a44;color:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="tag">MOCK-UP #6</div>
+<div class="vf" id="vf">
+ <div class="hud"><div class="job">WOR201311802073 · 62A · BROOKVALE</div><div class="dots" id="dots"></div></div>
+ <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+ <div class="want"><div class="lbl" id="wlbl">Point at</div><div class="what" id="what">New battery A1 - the sticker</div><div class="tip" id="wtip">The camera works out the rest</div></div>
+ <div class="toast" id="toast"></div>
+ <div class="shutterbar">
+  <button class="sidebtn" onclick="openSheet()">VIEW<br>SHEET</button>
+  <div class="shutter" id="shut"></div>
+  <button class="sidebtn" onclick="typeInstead()">TYPE<br>IT</button>
+ </div>
+ <div class="flash" id="flash"></div>
+</div>
+<div class="keypad" id="pad">
+ <div class="kq" id="kq">OCV for A1?</div>
+ <div class="kv" id="kv"></div>
+ <div class="keys">
+  <button onclick="key('1')">1</button><button onclick="key('2')">2</button><button onclick="key('3')">3</button>
+  <button onclick="key('4')">4</button><button onclick="key('5')">5</button><button onclick="key('6')">6</button>
+  <button onclick="key('7')">7</button><button onclick="key('8')">8</button><button onclick="key('9')">9</button>
+  <button onclick="key('.')">·</button><button onclick="key('0')">0</button><button class="okk" onclick="padOK()">OK ✓</button>
+ </div>
+</div>
+<div class="sheet" id="sheet">
+ <h2>The sheet, filling itself</h2>
+ <div class="s">62AH Battery WOR201311802073.xlsx - live view</div>
+ <div id="rows"></div>
+ <div class="sendbar" id="sendbar" style="display:none"><button class="bigsend" onclick="fin()">Sheet complete - Send to nbn ✓</button></div>
+ <div class="sendbar" id="backbar"><button class="bigsend" style="background:#20262c" onclick="closeSheet()">Back to camera 📷</button></div>
+</div>
+<script>
+const B=['A1','A2','A3','A4'];
+const SERS=['0013301624','0013301627','0013310784','0013310808'];
+const OLDS=['N2002172977','N2002172981','N2001988014','N2002171205'];
+const tasks=[];
+B.forEach((b,i)=>{tasks.push({t:'OCV for new '+b,k:'ocv',i:i,tip:'Number off the meter - big keypad'},
+ {t:'New '+b+' - the sticker + serial',k:'new',i:i,tip:'One shot grabs the batch date AND serial'});});
+B.forEach((b,i)=>{tasks.push({t:'Old '+b+' - the barcode',k:'old',i:i,tip:'One shot grabs serial AND date'});});
+tasks.push({t:'String A Voltage',k:'strv',tip:'Number off the meter'},{t:'String A Current',k:'stra',tip:'Last one'});
+let ti=0;const got=[];
+const el=id=>document.getElementById(id);
+function dots(){el('dots').innerHTML=tasks.map((_,i)=>'<i class="'+(i<ti?'on':'')+'"></i>').join('');}
+function show(){
+ const t=tasks[ti];
+ if(!t){allDone();return;}
+ el('what').textContent=t.t;el('wtip').textContent=t.tip;
+ el('wlbl').textContent=(t.k==='ocv'||t.k==='strv'||t.k==='stra')?'Tap the shutter to enter':'Point at';
+ dots();
+}
+let pv='';
+el('shut').onclick=()=>{
+ const t=tasks[ti];if(!t)return;
+ if(t.k==='ocv'||t.k==='strv'||t.k==='stra'){openPad(t);return;}
+ el('flash').classList.remove('go');void el('flash').offsetWidth;el('flash').classList.add('go');
+ let msg;
+ if(t.k==='new'){msg='<b>CAPTURED</b> Batch 1125 → Nov 25 · SN <b>'+SERS[t.i]+'</b>';got.push('New '+B[t.i]+' · 1125 · '+SERS[t.i]);}
+ else{msg='<b>CAPTURED</b> '+OLDS[t.i]+' · Mfg Feb 2020';got.push('Old '+B[t.i]+' · '+OLDS[t.i]+' · Feb 20');}
+ toast(msg);ti++;setTimeout(show,250);
+};
+function toast(h){const x=el('toast');x.innerHTML=h+' ✓';x.style.display='block';clearTimeout(x._t);x._t=setTimeout(()=>x.style.display='none',1800);}
+function openPad(t){pv='';el('kv').textContent='';el('kq').textContent=t.t+'?';el('pad').style.display='flex';}
+function key(k){if(pv.length<5)pv+=k;el('kv').textContent=pv;}
+function padOK(){
+ const t=tasks[ti];const v=pv||(t.k==='ocv'?'13.1':t.k==='strv'?'52.0':'5.9');
+ got.push(t.t+' · '+v);el('pad').style.display='none';toast('<b>'+t.t+'</b> = '+v);ti++;setTimeout(show,250);
+}
+function typeInstead(){const t=tasks[ti];if(!t)return;openPad({t:t.t+' (typed)',k:'ocv'});}
+function openSheet(){
+ el('rows').innerHTML=got.map(g=>'<div class="srow"><span class="ok">✓</span>'+g+'</div>').join('')||'<div class="srow">Nothing captured yet - get shooting</div>';
+ el('sheet').style.display='block';
+ el('sendbar').style.display=ti>=tasks.length?'block':'none';
+ el('backbar').style.display=ti>=tasks.length?'none':'block';
+}
+function closeSheet(){el('sheet').style.display='none';}
+function allDone(){el('what').textContent='Everything captured';el('wtip').textContent='Tap VIEW SHEET to check and send';el('wlbl').textContent='Done';dots();openSheet();}
+function fin(){
+ el('rows').innerHTML='<div class="srow"><span class="ok">🎉</span> Sent. Filed to nbn Drive + emailed to nbn@ with photos.</div>'+el('rows').innerHTML;
+ el('sendbar').innerHTML='<button class="bigsend" onclick="location.reload()">Restart demo</button>';
+}
+show();
+</script>
+</body>
+</html>
