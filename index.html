@@ -233,10 +233,11 @@ input:focus{outline:2px solid var(--blue)}
     <div id="n-sertype" style="display:none;margin-top:8px">
       <input type="text" id="n-serial" placeholder="Type Serial Number (10 digits)" inputmode="numeric" maxlength="10">
     </div>
-    <button class="btn green" id="savenewbtn" onclick="saveBattery()">Save this Battery, Next Battery</button>
+    <button class="btn green" id="savenewbtn" onclick="saveBattery()">Save this Battery<br>Next Battery</button>
     <label>Comment - Optional</label>
-    <input type="text" id="n-comment" placeholder="e.g. replacement looks used">
+    <input type="text" id="n-comment">
   </div>
+  <button class="btn green" id="finishnew" style="display:none" onclick="finishNew()">Save all New Battery data<br>Move to Old Batteries</button>
   <div class="footer"><button class="btn ghost" onclick="go('s-confirm')">Back</button></div>
 </section>
 
@@ -264,9 +265,10 @@ input:focus{outline:2px solid var(--blue)}
       <label style="font-weight:800">Manufacture Date</label>
       <input type="text" id="o-date" placeholder="Type MMYY Only" inputmode="numeric" maxlength="4" onblur="this.value=padDate(this.value)">
     </div>
-    <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery, Next Battery</button>
+    <button class="btn green" id="saveoldbtn" onclick="saveOldBattery()">Save this Battery<br>Next Battery</button>
     <button class="btn ghost small" style="display:block;width:100%;margin-top:10px" onclick="oldNA()">No sticker? Mark NA - done</button>
   </div>
+  <button class="btn green" id="finishold" style="display:none" onclick="finishOld()">Save all Old Battery data<br>Move to String Test</button>
   <div class="footer"><button class="btn ghost" onclick="go('s-new')">Back</button></div>
 </section>
 
@@ -393,13 +395,15 @@ function loadNew(i){const d=st.newData[i];
 function updateNewBar(){const done=st.newDone.includes(st.newIdx);const L=labels()[st.newIdx];
  const bar=document.getElementById('newreview');const btn=document.getElementById('savenewbtn');
  const isLast=!done&&labels().every((_,i)=>i===st.newIdx||st.newDone.includes(i));
- if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
- else{bar.style.display='none';btn.textContent=isLast?'Save this Battery, Move to Old Batteries':'Save this Battery, Next Battery';}}
-function saveBattery(){st.newData[st.newIdx]=captureNew();
- if(!st.newDone.includes(st.newIdx))st.newDone.push(st.newIdx);
- const next=labels().findIndex((_,i)=>!st.newDone.includes(i));
- if(next<0){renderTabs('newtabs',st.newIdx,st.newDone);go('s-old');}
- else{st.newIdx=next;renderTabs('newtabs',st.newIdx,st.newDone);loadNew(st.newIdx);}}
+ if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.innerHTML='Update '+L+' ✓';}
+ else{bar.style.display='none';btn.innerHTML=isLast?'Save this Battery':'Save this Battery<br>Next Battery';}
+ document.getElementById('finishnew').style.display=st.newDone.length>=labels().length?'block':'none';}
+function saveBattery(){const wasDone=st.newDone.includes(st.newIdx);
+ st.newData[st.newIdx]=captureNew();
+ if(!wasDone)st.newDone.push(st.newIdx);
+ if(!wasDone){const next=labels().findIndex((_,i)=>!st.newDone.includes(i));if(next>=0)st.newIdx=next;}
+ renderTabs('newtabs',st.newIdx,st.newDone);loadNew(st.newIdx);}
+function finishNew(){stashNew();go('s-old');}
 const demoOld=[["N2002172977","17 Feb 2020"],["N2002172981","17 Feb 2020"],["N2001988014","3 Dec 2019"],["N2002171205","12 Feb 2020"],["N2001990227","5 Dec 2019"],["N2002168830","10 Feb 2020"],["N2001987336","2 Dec 2019"],["N2002170518","11 Feb 2020"]];
 function oldMode(m,f){document.getElementById('oldseg1').classList.toggle('sel',m===1);document.getElementById('oldseg2').classList.toggle('sel',m===2);document.getElementById('o-camzone').style.display=m===1?'block':'none';document.getElementById('o-typezone').style.display=m===2?'block':'none';
  if(m===2&&document.getElementById('o-scan').style.display==='block'){document.getElementById('o-serial').value=document.getElementById('oldval').textContent;document.getElementById('o-date').value=document.getElementById('olddate').textContent;}
@@ -412,8 +416,9 @@ function captureOld(){const cam=document.getElementById('oldseg1').classList.con
  const scanned=cam&&document.getElementById('o-scan').style.display==='block';
  if(scanned)return {scan:true,serial:document.getElementById('oldval').textContent,date:document.getElementById('olddate').textContent};
  return {serial:cam?'':document.getElementById('o-serial').value,date:cam?'':padDate(document.getElementById('o-date').value)};}
-function saveOldBattery(){st.oldData[st.oldIdx]=captureOld();markOld();}
-function oldNA(){st.oldData[st.oldIdx]={na:true};markOld();}
+function saveOldBattery(){const wasDone=st.oldDone.includes(st.oldIdx);st.oldData[st.oldIdx]=captureOld();markOld(wasDone);}
+function oldNA(){const wasDone=st.oldDone.includes(st.oldIdx);st.oldData[st.oldIdx]={na:true};markOld(wasDone);}
+function finishOld(){stashOld();go('s-string');}
 function loadOld(i){const d=st.oldData[i];
  document.getElementById('o-scan').style.display='none';document.getElementById('o-nabar').style.display='none';
  document.getElementById('o-serial').value='';document.getElementById('o-date').value='';
@@ -425,12 +430,12 @@ function loadOld(i){const d=st.oldData[i];
 function updateOldBar(){const done=st.oldDone.includes(st.oldIdx);const L=labels()[st.oldIdx];
  const bar=document.getElementById('oldreview');const btn=document.getElementById('saveoldbtn');
  const isLast=!done&&labels().every((_,i)=>i===st.oldIdx||st.oldDone.includes(i));
- if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.textContent='Update '+L+' ✓';}
- else{bar.style.display='none';btn.textContent=isLast?'Save this Battery, Move to String Test':'Save this Battery, Next Battery';}}
-function markOld(){if(!st.oldDone.includes(st.oldIdx))st.oldDone.push(st.oldIdx);
- const next=labels().findIndex((_,i)=>!st.oldDone.includes(i));
- if(next<0){renderTabs('oldtabs',st.oldIdx,st.oldDone);go('s-string');}
- else{st.oldIdx=next;renderTabs('oldtabs',st.oldIdx,st.oldDone);loadOld(st.oldIdx);}}
+ if(done){bar.style.display='block';bar.innerHTML='👀 Checking <b>'+L+'</b> - already saved. Change anything, then tap Update.';btn.innerHTML='Update '+L+' ✓';}
+ else{bar.style.display='none';btn.innerHTML=isLast?'Save this Battery':'Save this Battery<br>Next Battery';}
+ document.getElementById('finishold').style.display=st.oldDone.length>=labels().length?'block':'none';}
+function markOld(wasDone){if(!st.oldDone.includes(st.oldIdx))st.oldDone.push(st.oldIdx);
+ if(!wasDone){const next=labels().findIndex((_,i)=>!st.oldDone.includes(i));if(next>=0)st.oldIdx=next;}
+ renderTabs('oldtabs',st.oldIdx,st.oldDone);loadOld(st.oldIdx);}
 function buildSummary(){const c=st.job;const f=c.size+"H Battery "+c.wor+".xlsx";
  let h='<div class="kv"><span>WOR</span><b>'+c.wor+'</b></div><div class="kv"><span>INC</span><b>'+c.inc+'</b></div><div class="kv"><span>Batteries</span><b>'+st.qty+' replaced</b></div><div class="kv"><span>File</span><b>'+f+'</b></div>';
  const rows=labels().map(function(l,i){const d=st.newData[i];
