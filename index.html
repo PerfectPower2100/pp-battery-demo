@@ -102,6 +102,14 @@ input:focus{outline:2px solid var(--blue)}
 .seg button.sel{background:var(--blue);color:#fff}
 .btn.flag{background:#fff;color:#556;border:2px solid var(--line);font-size:15px}
 .btn.flag.flagon{background:#fff3cd;border-color:#d9a400;color:#7a5c00}
+.splash{position:fixed;inset:0;z-index:200;background:radial-gradient(ellipse at 30% 15%,#3a4f63 0%,#131a22 55%,#000 100%);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;max-width:480px;margin:0 auto}
+.splash.on{display:flex;animation:splashin .25s ease-out}
+.splash img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.splash .veil{position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.05) 45%,rgba(0,0,0,.75))}
+.splash .zap{position:relative;font-size:60px;filter:drop-shadow(0 0 18px rgba(245,220,0,.8))}
+.splash .nm{position:relative;font-size:56px;font-weight:900;color:#fff;letter-spacing:3px;text-shadow:0 4px 24px rgba(0,0,0,.85)}
+.splash .tag2{position:relative;color:#f5dc00;font-weight:800;font-size:16px;letter-spacing:2px;margin-top:8px}
+@keyframes splashin{from{opacity:0;transform:scale(1.07)}to{opacity:1;transform:scale(1)}}
 </style>
 </head>
 <body>
@@ -111,6 +119,13 @@ input:focus{outline:2px solid var(--blue)}
   <span class="badge" id="netbadge">ONLINE</span>
 </header>
 <div class="demo-tag">DEMO - dummy data</div>
+<div class="splash" id="splash" onclick="endSplash()">
+  <img id="splash-img" alt="" style="display:none">
+  <div class="veil"></div>
+  <div class="zap" id="splash-zap">⚡</div>
+  <div class="nm" id="splash-name"></div>
+  <div class="tag2" id="splash-tag"></div>
+</div>
 
 <!-- 0: name pick -->
 <section class="screen on" id="s-name">
@@ -321,6 +336,7 @@ input:focus{outline:2px solid var(--blue)}
 </section>
 
 <script src="logo.js"></script>
+<script src="photos.js"></script>
 <script>
 const jobs=[
  {wor:"WOR201311802073",inc:"INC000091234567",addr:"Cnr Pittwater Rd & Winbourne Rd, Brookvale",size:"62A",qty:4},
@@ -328,7 +344,21 @@ const jobs=[
  {wor:"WOR201303348444",inc:"INC000090877310",addr:"12 Ocean St, Narraweena",size:"100A",qty:4}];
 let st={tech:"",job:null,qty:0,newIdx:0,oldIdx:0,newDone:[],oldDone:[],newData:{},oldData:{}};
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
-function pickName(n){st.tech=n;go('s-jobs');}
+const TECH_SPLASH={'Beau':{tag:'POWERED UP. LET\'S GO.'}};
+const splashSeen={};let splashTimer=null;
+function pickName(n){st.tech=n;
+ const s=TECH_SPLASH[n];
+ if(s&&!splashSeen[n]){splashSeen[n]=1;showSplash(n,s);}
+ else go('s-jobs');}
+function showSplash(n,s){const im=document.getElementById('splash-img');
+ const photo=(typeof TECH_PHOTOS!=='undefined')&&TECH_PHOTOS[n];
+ if(photo){im.src=photo;im.style.display='block';document.getElementById('splash-zap').style.display='none';}
+ else{im.style.display='none';document.getElementById('splash-zap').style.display='block';}
+ document.getElementById('splash-name').textContent=n.toUpperCase();
+ document.getElementById('splash-tag').textContent=s.tag;
+ document.getElementById('splash').classList.add('on');
+ splashTimer=setTimeout(endSplash,2000);}
+function endSplash(){clearTimeout(splashTimer);document.getElementById('splash').classList.remove('on');go('s-jobs');}
 function pickJob(i){st.job=jobs[i];fillConfirm();go('s-confirm');}
 function manualJob(){const v=document.getElementById('manualwor').value.trim();st.job={wor:"WOR"+(v||"201399999999"),inc:"INC000099999999",addr:"(from Novus once synced)",size:"62A",qty:4};fillConfirm();go('s-confirm');}
 function fillConfirm(){c=st.job;document.getElementById('c-wor').textContent=c.wor;document.getElementById('c-inc').textContent=c.inc;document.getElementById('c-addr').textContent=c.addr;document.getElementById('c-size').textContent=c.size+" ("+c.qty+" batteries per Novus)";setQty(c.qty);setDate('today');}
